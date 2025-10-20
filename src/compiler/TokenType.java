@@ -4,9 +4,11 @@ public enum TokenType {
   EOF,
   ILLEGAL,
 
+  SEMI,
+
   // Identifiers, Literals
-  Identifier,
-  Integer,
+  IDENTIFIER,
+  Integer,  
 
   // Operators
   ASSIGN,
@@ -15,8 +17,8 @@ public enum TokenType {
   MINUS,
 
   // Delimiters
-  LParen, RParen, 
-  LBrace, RBrace,
+  LPAREN, RPAREN, 
+  LBRACE, RBRACE,
 
   // Keywords
   WHILE, BOOLEAN, INTEGER, TRUE, FALSE, PRINTSTATEMENT, CLASS

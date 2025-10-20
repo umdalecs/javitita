@@ -18,7 +18,7 @@ public class Lexer {
       return kw;
     }
 
-    return TokenType.Identifier;
+    return TokenType.IDENTIFIER;
   }
 
   private String input;
@@ -42,15 +42,20 @@ public class Lexer {
   }
 
   public Token nextToken() throws LexicalException {
+    while (" \n\t".indexOf(this.currentChar) != -1) {
+      readChar();
+    }
+
     Token token = switch (this.currentChar) {
       case '=' -> new Token(TokenType.ASSIGN, this.currentChar);
       case '<' -> new Token(TokenType.LOWERT, this.currentChar);
       case '+' -> new Token(TokenType.PLUS, this.currentChar);
       case '-' -> new Token(TokenType.MINUS, this.currentChar);
-      case '{' -> new Token(TokenType.LBrace, this.currentChar);
-      case '}' -> new Token(TokenType.RBrace, this.currentChar);
-      case '(' -> new Token(TokenType.LParen, this.currentChar);
-      case ')' -> new Token(TokenType.RParen, this.currentChar);
+      case '{' -> new Token(TokenType.LBRACE, this.currentChar);
+      case '}' -> new Token(TokenType.RBRACE, this.currentChar);
+      case '(' -> new Token(TokenType.LPAREN, this.currentChar);
+      case ')' -> new Token(TokenType.RPAREN, this.currentChar);
+      case ';' -> new Token(TokenType.SEMI, this.currentChar);
       case 0 -> new Token(TokenType.EOF, "");
       default -> {
         if (Character.isAlphabetic(this.currentChar)) {
@@ -60,7 +65,7 @@ public class Lexer {
           yield new Token(TokenType.INTEGER, readNumber());
         } 
         throw new LexicalException(
-          "Illegal token", 
+          "Illegal token",
           new Token(TokenType.ILLEGAL, this.currentChar)
           );
       }
