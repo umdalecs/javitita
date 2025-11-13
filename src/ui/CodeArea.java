@@ -12,12 +12,14 @@ public class CodeArea extends JPanel {
         codeField = new JTextArea();
         codeField.setText("""
                 class Test {
-                  int x ;
-                  x = 5 ;
-                    while ( x < 10 ) {
-                      println( x ) ;
-                      x = x + 1 ;
-                    }
+                  void main() {
+                    int x ;
+                    x = 5 ;
+                      while ( x < 10 ) {
+                        println( x ) ;
+                        x = x + 1 ;
+                      }
+                  }
                 }
                 """);
         var scrollPane = new JScrollPane(codeField);

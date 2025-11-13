@@ -16,11 +16,11 @@ public class ErrorArea extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    public String getText() {
-        return errorArea.getText();
+    public void reset() {
+        errorArea.setText("");
     }
 
-    public void setText(String newText){
-        errorArea.setText(newText);
+    public void addText(String newText){
+        errorArea.setText(errorArea.getText() + newText + "\n");
     }
 }

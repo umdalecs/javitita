@@ -28,10 +28,6 @@ public class Token {
     return literal;
   }
 
-  public void setLiteral(String literal) {
-    this.literal = literal;
-  }
-
   public boolean equals(Token obj) {
     return this.type.equals(obj.type) && this.literal.equals(obj.literal);
   }
