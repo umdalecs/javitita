@@ -33,17 +33,16 @@ public class Lexer {
   }
 
   private void readChar() {
-    if (this.readPosition >= input.length())
-      this.currentChar = 0;
-    else
-      this.currentChar = this.input.charAt(this.readPosition);
+    this.currentChar = this.readPosition >= input.length()
+      ? 0
+      : this.input.charAt(this.readPosition);
 
     this.position = this.readPosition++;
   }
 
   public Token nextToken() throws LexicalException {
     while (" \n\t".indexOf(this.currentChar) != -1) {
-      readChar();
+      this.readChar();
     }
 
     Token token = switch (this.currentChar) {
@@ -55,24 +54,25 @@ public class Lexer {
       case '}' -> new Token(TokenType.RBRACE, this.currentChar);
       case '(' -> new Token(TokenType.LPAREN, this.currentChar);
       case ')' -> new Token(TokenType.RPAREN, this.currentChar);
-      case ';' -> new Token(TokenType.SEMI, this.currentChar);
+      case ';' -> new Token(TokenType.SEMICOLON, this.currentChar);
       case 0 -> new Token(TokenType.EOF, "");
       default -> {
         if (Character.isAlphabetic(this.currentChar)) {
           var identifier = readIdentifier();
           yield new Token(lookupIdent(identifier), identifier);
-        } else if (Character.isDigit(this.currentChar)) {
-          yield new Token(TokenType.INTEGER, readNumber());
+        } 
+        else if (Character.isDigit(this.currentChar)) {
+          yield new Token(TokenType.INTEGERLITERAL, readNumber());
         } 
         throw new LexicalException(
           "Illegal token",
           new Token(TokenType.ILLEGAL, this.currentChar)
           );
       }
-    }
-    ;
+    };
 
-    this.readChar();
+    // if("=<+-{}();".indexOf(this.currentChar) != -1)
+      this.readChar();
 
     return token;
   }

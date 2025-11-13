@@ -1,16 +1,13 @@
-import javax.swing.SwingUtilities;
-
 import com.formdev.flatlaf.FlatLightLaf;
-
 import ui.LexerWindow;
 
-public class App {
-    public static void main(String[] args) throws Exception {
-        FlatLightLaf.setup();
+import javax.swing.*;
 
-        SwingUtilities.invokeLater(() -> {
-            var gui = new LexerWindow();
-            gui.setVisible(true);
-        });
-    }
+void main() {
+    FlatLightLaf.setup();
+
+    SwingUtilities.invokeLater(() -> {
+        var gui = new LexerWindow();
+        gui.setVisible(true);
+    });
 }

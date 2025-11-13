@@ -1,7 +1,6 @@
 package ui;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 import compiler.Lexer;
 import compiler.LexicalException;
@@ -9,159 +8,104 @@ import compiler.Token;
 import compiler.TokenType;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LexerWindow extends JFrame {
-  private JTextArea codigoArea;
-  private JTextArea erroresArea;
-  private DefaultTableModel lexemModel;
-  private DefaultTableModel symbolModel;
+public class LexerWindow extends JFrame implements ActionListener {
+    private final CodeArea codeArea;
+    private final ErrorArea errorArea;
+    private final LexemArea lexemArea;
+    private final SymbolArea symbolArea;
 
-  private Set<String> identifiers;
+    public LexerWindow() {
+        setTitle("Análisis Léxico");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setSize(1920, 1080);
+        setLayout(new BorderLayout());
 
-  public LexerWindow() {
-    setTitle("Análisis Léxico");
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setResizable(false);
-    setSize(1920, 1080);
-    setLayout(new BorderLayout());
+        var centroPanel = new JPanel();
+        centroPanel.setLayout(new GridLayout(2, 2, 5, 5));
 
-    var centroPanel = new JPanel();
-    centroPanel.setLayout(new GridLayout(2, 2, 5, 5));
+        centroPanel.add(this.codeArea = new CodeArea());
+        centroPanel.add(this.errorArea = new ErrorArea());
+        centroPanel.add(this.lexemArea = new LexemArea());
+        centroPanel.add(this.symbolArea = new SymbolArea());
 
-    centroPanel.add(crearPanelCodigo());
-    centroPanel.add(crearPanelErrores());
-    centroPanel.add(crearPanelLexemas());
-    centroPanel.add(crearPanelTablaSimbolos());
+        add(centroPanel, BorderLayout.CENTER);
 
-    add(centroPanel, BorderLayout.CENTER);
+        var surPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        var analisisButton = new JButton("Análisis Léxico");
 
-    var surPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    var analisisButton = new JButton("Análisis Léxico");
+        analisisButton.addActionListener(this);
 
-    analisisButton.addActionListener((_) -> {
-      this.identifiers = new HashSet<>();
+        surPanel.add(analisisButton);
 
-      var input = codigoArea.getText();
+        add(surPanel, BorderLayout.SOUTH);
+        setLocationRelativeTo(null);
+    }
 
-      var lexer = new Lexer(input);
-      Token token;
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Set<String> identifiers = new HashSet<>();
 
-      lexemModel.setRowCount(0);
-      symbolModel.setRowCount(0);
+        var input = codeArea.getText();
 
-      do {
-        try {
-          token = lexer.nextToken();
+        var lexer = new Lexer(input);
+        Token token;
 
-          switch(token.getType()) {
-            case ASSIGN, LOWERT,
-              PLUS, MINUS,LPAREN,
-              RPAREN,LBRACE,RBRACE,
-              WHILE,BOOLEAN,INTEGER, SEMI,
-              TRUE,FALSE,PRINTSTATEMENT, CLASS -> {
-              Object[] row = {token.getLiteral(), token.getType().name()};
-              lexemModel.addRow(row);
+        SwingUtilities.invokeLater(() -> {
+            errorArea.setText("");
+            lexemArea.setRowCount(0);
+            symbolArea.setRowCount(0);
+        });
 
-              SwingUtilities.invokeLater(() -> {
-                lexemModel.addRow(row);
-              });
+        do {
+            try {
+                token = lexer.nextToken();
+
+                switch (token.getType()) {
+                    case ASSIGN, LOWERT,
+                         PLUS, MINUS, LPAREN,
+                         RPAREN, LBRACE, RBRACE, INTEGERLITERAL,
+                         WHILE, BOOLEAN, INTEGER, SEMICOLON,
+                         TRUE, FALSE, PRINTSTATEMENT, CLASS -> {
+                        Object[] row = {token.getLiteral(), token.getType().name()};
+
+                        SwingUtilities.invokeLater(() -> {
+                            lexemArea.addRow(row);
+                        });
+                    }
+                    case IDENTIFIER -> {
+                        Object[] lexemRow = {token.getLiteral(), token.getType().name()};
+
+                        SwingUtilities.invokeLater(() -> {
+                            lexemArea.addRow(lexemRow);
+                        });
+
+                        if (identifiers.add(token.getLiteral())) {
+                            Object[] symbolRow = {token.getLiteral()};
+
+                            SwingUtilities.invokeLater(() -> {
+                                symbolArea.addRow(symbolRow);
+                            });
+                        }
+
+                    }
+                    default -> {
+                    }
+                }
+            } catch (LexicalException ex) {
+                String error = String.format("%s: %s `%s`",
+                        ex.getMessage(),
+                        ex.getToken().getType().name(),
+                        ex.getToken().getLiteral()
+                );
+                this.errorArea.setText(errorArea.getText() + "\n" + error);
+                break;
             }
-            case IDENTIFIER -> {
-              Object[] lexemRow = {token.getLiteral(), token.getType().name()};
-              lexemModel.addRow(lexemRow);
-
-              SwingUtilities.invokeLater(() -> {
-                lexemModel.addRow(lexemRow);
-              });
-
-              if (identifiers.add(token.getLiteral())){
-                Object[] symbolRow = {token.getLiteral()};
-
-                SwingUtilities.invokeLater(() -> {
-                  symbolModel.addRow(symbolRow);
-                });
-              } 
-
-            }
-            default -> {}
-          }
-        } catch (LexicalException e) {
-          String error = String.format("""
-            %s: %s `%s`
-          """, e.getMessage(), e.getToken().getType().name(), e.getToken().getLiteral());
-          this.erroresArea.setText(error);
-          break;
-        }
-      } while (token.getType() != TokenType.EOF);
-    });
-
-    surPanel.add(analisisButton);
-
-    add(surPanel, BorderLayout.SOUTH);
-    setLocationRelativeTo(null);
-  }
-
-  private JPanel crearPanelCodigo() {
-    var panel = new JPanel(new BorderLayout());
-    panel.setBorder(BorderFactory.createTitledBorder("Editor de Código (Zona de Entrada)"));
-
-    this.codigoArea = new JTextArea();
-    this.codigoArea.setText("""
-        class Test {
-          int x ;
-          x = 5 ;
-            while ( x < 10 ) {
-              println( x ) ;
-              x = x + 1 ;
-            }
-        } 
-        """);
-    var scrollPane = new JScrollPane(codigoArea);
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
-  }
-
-  private JPanel crearPanelErrores() {
-    var panel = new JPanel(new BorderLayout());
-    panel.setBorder(BorderFactory.createTitledBorder("Zona de Errores Léxicos"));
-
-    this.erroresArea = new JTextArea();
-    erroresArea.setEditable(false);
-    var scrollPane = new JScrollPane(erroresArea);
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
-  }
-
-  private JPanel crearPanelLexemas() {
-    var panel = new JPanel(new BorderLayout());
-    panel.setBorder(BorderFactory.createTitledBorder("Zona de Lexemas y Componentes Léxicos"));
-
-    String[] columnas = {"Lexema", "Componente Léxico"};
-    Object[][] datos = {};
-
-    this.lexemModel = new DefaultTableModel(datos, columnas);
-    var lexemasTable = new JTable(lexemModel);
-    var scrollPane = new JScrollPane(lexemasTable);
-
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
-  }
-
-  private JPanel crearPanelTablaSimbolos() {
-    var panel = new JPanel(new BorderLayout());
-    panel.setBorder(BorderFactory.createTitledBorder("Tabla de Símbolos"));
-
-    String[] columnas = {"Identificador", "Tipo", "Valor", "Posición"};
-    Object[][] datos = {};
-
-    this.symbolModel = new DefaultTableModel(datos, columnas);
-    var simbolosTable = new JTable(symbolModel);
-    var scrollPane = new JScrollPane(simbolosTable);
-
-    panel.add(scrollPane, BorderLayout.CENTER);
-    return panel;
-  }
+        } while (token.getType() != TokenType.EOF);
+    }
 }

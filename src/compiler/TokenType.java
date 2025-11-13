@@ -4,11 +4,11 @@ public enum TokenType {
   EOF,
   ILLEGAL,
 
-  SEMI,
+  SEMICOLON,
 
   // Identifiers, Literals
   IDENTIFIER,
-  Integer,  
+  INTEGERLITERAL,
 
   // Operators
   ASSIGN,
@@ -17,7 +17,7 @@ public enum TokenType {
   MINUS,
 
   // Delimiters
-  LPAREN, RPAREN, 
+  LPAREN, RPAREN,
   LBRACE, RBRACE,
 
   // Keywords
