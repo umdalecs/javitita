@@ -25,7 +25,7 @@ public class SymbolArea extends JPanel {
         this.symbolModel.addRow(row);
     }
 
-    public void setRowCount(int count) {
-        this.symbolModel.setRowCount(count);
+    public void reset() {
+        this.symbolModel.setRowCount(0);
     }
 }

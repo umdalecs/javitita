@@ -48,24 +48,25 @@ public class Lexer {
         }
 
         Token token = switch (this.currentChar) {
-            case '=' -> new Token(TokenType.ASSIGN, this.currentChar);
-            case '<' -> new Token(TokenType.LOWERT, this.currentChar);
-            case '+' -> new Token(TokenType.PLUS, this.currentChar);
-            case '-' -> new Token(TokenType.MINUS, this.currentChar);
-            case '{' -> new Token(TokenType.LBRACE, this.currentChar);
-            case '}' -> new Token(TokenType.RBRACE, this.currentChar);
-            case '(' -> new Token(TokenType.LPAREN, this.currentChar);
-            case ')' -> new Token(TokenType.RPAREN, this.currentChar);
-            case ';' -> new Token(TokenType.SEMICOLON, this.currentChar);
-            case 0 -> new Token(TokenType.EOF, "");
+            case '=' -> new Token(TokenType.ASSIGN, this.currentChar, this.line);
+            case '<' -> new Token(TokenType.LOWERT, this.currentChar, this.line);
+            case '+' -> new Token(TokenType.PLUS, this.currentChar, this.line);
+            case '*' -> new Token(TokenType.MULT, this.currentChar, this.line);
+            case '-' -> new Token(TokenType.MINUS, this.currentChar, this.line);
+            case '{' -> new Token(TokenType.LBRACE, this.currentChar, this.line);
+            case '}' -> new Token(TokenType.RBRACE, this.currentChar, this.line);
+            case '(' -> new Token(TokenType.LPAREN, this.currentChar, this.line);
+            case ')' -> new Token(TokenType.RPAREN, this.currentChar, this.line);
+            case ';' -> new Token(TokenType.SEMICOLON, this.currentChar, this.line);
+            case 0 -> new Token(TokenType.EOF, "", this.line);
             default -> {
                 if (Character.isAlphabetic(this.currentChar)) {
                     var identifier = readIdentifier();
-                    yield new Token(lookupIdent(identifier), identifier);
+                    yield new Token(lookupIdent(identifier), identifier, this.line);
                 } else if (Character.isDigit(this.currentChar)) {
-                    yield new Token(TokenType.INTEGERLITERAL, readNumber());
+                    yield new Token(TokenType.INTEGERLITERAL, readNumber(), this.line);
                 }
-                yield new Token(TokenType.ILLEGAL, "line " + this.line + " illegal token `" + this.currentChar + "`");
+                yield new Token(TokenType.ILLEGAL, this.currentChar, this.line);
             }
         };
 

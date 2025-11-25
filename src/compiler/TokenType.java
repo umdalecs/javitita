@@ -11,7 +11,7 @@ public enum TokenType {
   INTEGERLITERAL,
 
   // Operators
-  ASSIGN,
+  ASSIGN, MULT,
   LOWERT,
   PLUS,
   MINUS,

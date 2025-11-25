@@ -25,8 +25,8 @@ public class LexemArea extends JPanel {
         this.lexemModel.addRow(row);
     }
 
-    public void setRowCount(int count) {
-        this.lexemModel.setRowCount(count);
+    public void reset() {
+        this.lexemModel.setRowCount(0);
     }
 }
 
