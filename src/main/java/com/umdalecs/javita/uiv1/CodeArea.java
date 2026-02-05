@@ -1,4 +1,4 @@
-package ui;
+package com.umdalecs.javita.uiv1;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,7 +7,7 @@ public class CodeArea extends JPanel {
     private final JTextArea codeField;
     public CodeArea() {
         super(new BorderLayout());
-        setBorder(BorderFactory.createTitledBorder("Editor de Código (Zona de Entrada)"));
+        setBorder(BorderFactory.createTitledBorder("Programa:"));
 
         codeField = new JTextArea();
         codeField.setText("""
@@ -16,7 +16,7 @@ public class CodeArea extends JPanel {
                     int x;
                     x = 5;
                       while (x<10){
-                        println( x);
+                        println(x);
                         x = x + 1;
                       }
                   }

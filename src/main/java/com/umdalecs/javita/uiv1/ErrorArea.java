@@ -1,4 +1,4 @@
-package ui;
+package com.umdalecs.javita.uiv1;
 
 import javax.swing.*;
 import java.awt.*;
