@@ -1,4 +1,4 @@
-package compiler;
+package com.umdalecs.javita.compiler;
 
 import java.util.*;
 

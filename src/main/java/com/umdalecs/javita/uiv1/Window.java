@@ -1,8 +1,8 @@
-package ui;
+package com.umdalecs.javita.uiv1;
 
 import javax.swing.*;
 
-import compiler.*;
+import com.umdalecs.javita.compiler.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
