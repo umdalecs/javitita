@@ -8,7 +8,7 @@ repositories {
 }
 
 application {
-    mainClass.set("com.umdalecs.javita.App")
+    mainClass.set("com.umdalecs.javitita.App")
 }
 
 dependencies {
