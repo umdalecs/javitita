@@ -1,8 +1,8 @@
-package com.umdalecs.javita;
+package com.umdalecs.javitita;
 
 import javax.swing.*;
 import com.formdev.flatlaf.FlatLightLaf;
-import com.umdalecs.javita.uiv2.Window;
+import com.umdalecs.javitita.uiv2.Window;
 
 public class App {
     public static void main(String[] args) {

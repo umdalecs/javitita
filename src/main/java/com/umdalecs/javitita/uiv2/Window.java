@@ -1,21 +1,21 @@
-package com.umdalecs.javita.uiv2;
+package com.umdalecs.javitita.uiv2;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+
+import com.umdalecs.javitita.compiler.Lexer;
+import com.umdalecs.javitita.compiler.Symbol;
+import com.umdalecs.javitita.compiler.Token;
+import com.umdalecs.javitita.compiler.TokenType;
+import com.umdalecs.javitita.uiv1.CodeArea;
+import com.umdalecs.javitita.uiv1.LexemArea;
+
 import javax.swing.JButton;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-
-import com.umdalecs.javita.compiler.Lexer;
-import com.umdalecs.javita.compiler.Symbol;
-import com.umdalecs.javita.compiler.Token;
-import com.umdalecs.javita.compiler.TokenType;
-import com.umdalecs.javita.uiv1.CodeArea;
-import com.umdalecs.javita.uiv1.LexemArea;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,7 +40,7 @@ public class Window extends JFrame implements ComponentListener {
         add(lexerButton = new JButton("Análisis léxico"));
         add(lexemArea = new LexemArea());
 
-        lexerButton.addActionListener(new PerformLexerAction());
+        lexerButton.addActionListener(new LexerActionPerformer());
 
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -123,7 +123,7 @@ public class Window extends JFrame implements ComponentListener {
         });
     }
 
-    class PerformLexerAction implements ActionListener {
+    class LexerActionPerformer implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             symbols = new LinkedHashMap<>();
@@ -144,10 +144,9 @@ public class Window extends JFrame implements ComponentListener {
                         return;
                     }
                     default -> {
-                        tokens.add(token);
                     }
                 }
-
+                tokens.add(token);
             }
         }
     }

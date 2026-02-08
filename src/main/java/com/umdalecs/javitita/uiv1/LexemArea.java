@@ -1,4 +1,4 @@
-package com.umdalecs.javita.uiv1;
+package com.umdalecs.javitita.uiv1;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
