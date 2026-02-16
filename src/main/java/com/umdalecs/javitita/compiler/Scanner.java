@@ -2,33 +2,35 @@ package com.umdalecs.javitita.compiler;
 
 import java.util.Map;
 
-public class Lexer {
-    public static final Map<String, TokenType> keywords = Map.of(
+public class Scanner {
+    private static final Map<String, TokenType> keywords = Map.of(
             "while", TokenType.WHILE,
             "println", TokenType.PRINTSTATEMENT,
             "class", TokenType.CLASS,
-            "boolean", TokenType.BOOLEAN,
             "int", TokenType.INTEGER,
+            "bool", TokenType.BOOLEAN,
             "true", TokenType.TRUE,
             "void", TokenType.VOID,
             "false", TokenType.FALSE);
 
-    public static TokenType lookupIdent(String identifier) {
+    private static TokenType lookupIdent(String identifier) {
         var kw = keywords.get(identifier);
 
-        if (kw != null) return kw;
+        if (kw != null)
+            return kw;
 
         return TokenType.IDENTIFIER;
     }
 
     private final String input;
-    private int position, readPosition, line;
+    private int position, readPosition, line, column;
     private char currentChar;
 
-    public Lexer(String input) {
+    public Scanner(String input) {
         this.input = input;
         this.position = this.readPosition = 0;
         this.line = 1;
+        this.column = 1;
 
         this.readChar();
     }
@@ -43,35 +45,35 @@ public class Lexer {
 
     public Token nextToken() {
         while (" \n\t".indexOf(this.currentChar) != -1) {
-            if (this.currentChar == '\n') this.line++;
+            if (this.currentChar == '\n'){
+                this.line++;
+                this.column = 1;
+            }
             this.readChar();
         }
-
         Token token = switch (this.currentChar) {
-            case '=' -> new Token(TokenType.ASSIGN, this.currentChar, this.line);
-            case '<' -> new Token(TokenType.LOWERT, this.currentChar, this.line);
-            case '+' -> new Token(TokenType.PLUS, this.currentChar, this.line);
-            case '*' -> new Token(TokenType.MULT, this.currentChar, this.line);
-            case '-' -> new Token(TokenType.MINUS, this.currentChar, this.line);
-            case '{' -> new Token(TokenType.LBRACE, this.currentChar, this.line);
-            case '}' -> new Token(TokenType.RBRACE, this.currentChar, this.line);
-            case '(' -> new Token(TokenType.LPAREN, this.currentChar, this.line);
-            case ')' -> new Token(TokenType.RPAREN, this.currentChar, this.line);
-            case ';' -> new Token(TokenType.SEMICOLON, this.currentChar, this.line);
-            case 0 -> new Token(TokenType.EOF, "", this.line);
+            case '=' -> new Token(TokenType.ASSIGN, currentChar, line, column, position);
+            case '<' -> new Token(TokenType.LOWERT, currentChar, line, column, position);
+            case '+' -> new Token(TokenType.PLUS, currentChar, line, column, position);
+            case '*' -> new Token(TokenType.MULT, currentChar, line, column, position);
+            case '-' -> new Token(TokenType.MINUS, currentChar, line, column, position);
+            case '{' -> new Token(TokenType.LBRACE, currentChar, line, column, position);
+            case '}' -> new Token(TokenType.RBRACE, currentChar, line, column, position);
+            case '(' -> new Token(TokenType.LPAREN, currentChar, line, column, position);
+            case ')' -> new Token(TokenType.RPAREN, currentChar, line, column, position);
+            case ';' -> new Token(TokenType.SEMICOLON, currentChar, line, column, position);
+            case 0 -> new Token(TokenType.EOF, "", line, column, position);
             default -> {
-                if (Character.isAlphabetic(this.currentChar)) {
+                if (Character.isAlphabetic(currentChar)) {
                     var identifier = readIdentifier();
-                    yield new Token(lookupIdent(identifier), identifier, this.line);
-                } else if (Character.isDigit(this.currentChar)) {
-                    yield new Token(TokenType.INTEGERLITERAL, readNumber(), this.line);
+                    yield new Token(lookupIdent(identifier), identifier, line, column, position);
+                } else if (Character.isDigit(currentChar)) {
+                    yield new Token(TokenType.INTEGERLITERAL, readNumber(), line, column, position);
                 }
-                yield new Token(TokenType.ILLEGAL, this.currentChar, this.line);
+                yield new Token(TokenType.ILLEGAL, currentChar, line, column, position);
             }
         };
-
-        this.readChar();
-
+        readChar();
         return token;
     }
 

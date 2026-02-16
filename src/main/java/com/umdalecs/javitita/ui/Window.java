@@ -1,14 +1,12 @@
-package com.umdalecs.javitita.uiv2;
+package com.umdalecs.javitita.ui;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import com.umdalecs.javitita.compiler.Lexer;
+import com.umdalecs.javitita.compiler.Scanner;
 import com.umdalecs.javitita.compiler.Symbol;
 import com.umdalecs.javitita.compiler.Token;
 import com.umdalecs.javitita.compiler.TokenType;
-import com.umdalecs.javitita.uiv1.CodeArea;
-import com.umdalecs.javitita.uiv1.LexemArea;
 
 import javax.swing.JButton;
 
@@ -25,6 +23,7 @@ public class Window extends JFrame implements ComponentListener {
     private final CodeArea codeArea;
     private final LexemArea lexemArea;
     private final JButton lexerButton;
+    private final JButton parserButton;
 
     private List<Token> tokens;
     private Map<String, Symbol> symbols;
@@ -39,6 +38,7 @@ public class Window extends JFrame implements ComponentListener {
         add(codeArea = new CodeArea());
         add(lexerButton = new JButton("Análisis léxico"));
         add(lexemArea = new LexemArea());
+        add(parserButton =  new JButton("Análisis sintáctico"));
 
         lexerButton.addActionListener(new LexerActionPerformer());
 
@@ -61,13 +61,19 @@ public class Window extends JFrame implements ComponentListener {
                 (int) (this.getWidth() * .20),
                 (int) (this.getHeight() * .05));
 
+        parserButton.setBounds(
+                (int) (this.getWidth() * .5) + 10 + (int) (this.getWidth() * .20),
+                25,
+                (int) (this.getWidth() * .20),
+                (int) (this.getHeight() * .05));
+
+
         lexemArea.setBounds(
                 (this.getWidth() / 2) + 10,
                 (int) (this.getHeight() * .05 + 25),
                 (int) (this.getWidth() * .20),
                 (int) ((this.getHeight() * .5) - ((this.getHeight() * .05) + 25)));
 
-        // repaint();
         validate();
     }
 
@@ -85,41 +91,16 @@ public class Window extends JFrame implements ComponentListener {
 
     void updateInterface() {
         SwingUtilities.invokeLater(() -> {
-            // boolean flag = true;
             lexemArea.reset();
 
             for (Token token : tokens) {
                 if (token.type() == TokenType.ILLEGAL) {
-                    // flag = false;
-                    // errorArea.addText(
-                    // String.format("illegal token ( %s ) on line %d", token.literal(),
-                    // token.position()));
-                } else {
-                    Object[] row = { token.literal(), token.type().name() };
-                    lexemArea.addRow(row);
+                    codeArea.underlineText(token.absolutePos(), token.literal().length());
                 }
+                Object[] row = { token.literal(), token.type().tokenName() };
+                lexemArea.addRow(row);
             }
 
-            // for (var entry : symbols.entrySet()) {
-            // Object[] row = {
-            // entry.getValue().identifier(),
-            // entry.getValue().type(),
-            // entry.getValue().value(),
-            // entry.getValue().position()
-            // };
-            // symbolArea.addRow(row);
-            // }
-
-            // if (parserErrors != null) {
-            // for (var error : parserErrors) {
-            // SwingUtilities.invokeLater(() -> {
-            // errorArea.addText(error);
-            // });
-            // }
-            // parserErrors = null;
-            // }
-
-            // parseButton.setEnabled(flag);
         });
     }
 
@@ -129,14 +110,14 @@ public class Window extends JFrame implements ComponentListener {
             symbols = new LinkedHashMap<>();
             tokens = new ArrayList<>();
 
-            var lexer = new Lexer(codeArea.getText());
+            var lexer = new Scanner(codeArea.getText());
 
             while (true) {
                 Token token = lexer.nextToken();
 
                 switch (token.type()) {
                     case IDENTIFIER -> {
-                        symbols.put(token.literal(), new Symbol(token.literal(), "", "", token.position()));
+                        symbols.put(token.literal(), new Symbol(token.literal(), "", "", token.line(), token.column()));
                     }
                     case EOF -> {
                         updateInterface();
