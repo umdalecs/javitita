@@ -1,6 +1,9 @@
 package com.umdalecs.javitita.compiler;
 
-import java.util.*;
+import java.util.Map;
+import java.util.ListIterator;
+import java.util.List;
+import java.util.LinkedList;
 
 public class Parser {
     private final ListIterator<Token> tokens;
@@ -23,50 +26,50 @@ public class Parser {
         try {
             advance();
             if (currentToken.type() != TokenType.CLASS)
-                addError("CLASS", currentToken.position());
+                addError("CLASS", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.IDENTIFIER)
-                addError("IDENTIFICADOR", currentToken.position());
+                addError("IDENTIFICADOR", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.LBRACE)
-                addError("{", currentToken.position());
+                addError("{", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.VOID)
-                addError("VOID", currentToken.position());
+                addError("VOID", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.IDENTIFIER)
-                addError("IDENTIFICADOR", currentToken.position());
+                addError("IDENTIFICADOR", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.LPAREN)
-                addError("(", currentToken.position());
+                addError("(", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.RPAREN)
-                addError(")", currentToken.position());
+                addError(")", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.LBRACE)
-                addError("{", currentToken.position());
+                addError("{", currentToken.line(), currentToken.column());
 
             prodStatements();
 
             if (currentToken.type() != TokenType.RBRACE)
-                addError("}", currentToken.position());
+                addError("}", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.RBRACE)
-                addError("}", currentToken.position());
+                addError("}", currentToken.line(), currentToken.column());
 
             advance();
             if (currentToken.type() != TokenType.EOF)
-                addError("EOF", currentToken.position());
+                addError("EOF", currentToken.line(), currentToken.column());
         } catch (Exception e) {
-            errors.add("EOF inesperado en linea " + currentToken.position());
+            errors.add("EOF inesperado en linea " + currentToken.line());
         }
     }
 
@@ -76,8 +79,8 @@ public class Parser {
         }
     }
 
-    private void addError(String expected, int position) {
-        String msg = String.format("Se esperaba %s en la linea %d", expected, position);
+    private void addError(String expected, int line, int column) {
+        String msg = String.format("Se esperaba %s en la linea %d:%d", expected, line, column);
         errors.add(msg);
 
         tokens.previous();
@@ -109,50 +112,50 @@ public class Parser {
     private void prodWhile() throws Exception {
         advance();
         if (currentToken.type() != TokenType.LPAREN)
-            addError("(", currentToken.position());
+            addError("(", currentToken.line(), currentToken.column());
 
         prodExpression();
 
         advance();
         if (currentToken.type() != TokenType.RPAREN)
-            addError(")", currentToken.position());
+            addError(")", currentToken.line(), currentToken.column());
 
         advance();
         if (currentToken.type() != TokenType.LBRACE)
-            addError("{", currentToken.position());
+            addError("{", currentToken.line(), currentToken.column());
 
         prodStatements();
 
         if (currentToken.type() != TokenType.RBRACE)
-            addError("}", currentToken.position());
+            addError("}", currentToken.line(), currentToken.column());
     }
 
     private void prodPrintStatement() throws Exception {
         advance();
         if (currentToken.type() != TokenType.LPAREN)
-            addError("(", currentToken.position());
+            addError("(", currentToken.line(), currentToken.column());
 
         prodExpression();
 
         advance();
         if (currentToken.type() != TokenType.RPAREN)
-            addError(")", currentToken.position());
+            addError(")", currentToken.line(), currentToken.column());
 
         advance();
         if (currentToken.type() != TokenType.SEMICOLON)
-            addError(";", currentToken.position() - 1);
+            addError(";", currentToken.line(), currentToken.column() - 1);
     }
 
     private void prodVarAssignment() throws Exception {
         advance();
         if (currentToken.type() != TokenType.ASSIGN)
-            addError("=", currentToken.position());
+            addError("=", currentToken.line(), currentToken.column());
 
         prodExpression();
 
         advance();
         if (currentToken.type() != TokenType.SEMICOLON)
-            addError(";", currentToken.position() - 1);
+            addError(";", currentToken.line(), currentToken.column() - 1);
     }
 
     private void prodVarDeclaration() throws Exception {
@@ -160,23 +163,24 @@ public class Parser {
 
         advance();
         if (currentToken.type() != TokenType.IDENTIFIER)
-            addError("IDENTIFICADOR", currentToken.position());
+            addError("IDENTIFICADOR", currentToken.line(), currentToken.column());
 
         var identifier = currentToken.literal();
-        var position = currentToken.position();
+        var line = currentToken.line();
+        var column = currentToken.column();
 
         advance();
         if (currentToken.type() != TokenType.SEMICOLON)
-            addError(";", currentToken.position() - 1);
+            addError(";", currentToken.line(), currentToken.column() - 1);
 
-        symbols.put(identifier, new Symbol(identifier, type, "", position));
+        symbols.put(identifier, new Symbol(identifier, type, "", line, column));
     }
 
     private void prodSimpleExpression() throws Exception {
         advance();
         if (!(currentToken.type() == TokenType.SEMICOLON ||
                 currentToken.type() == TokenType.RPAREN)) {
-            addError("END OF EXPRESSION", currentToken.position());
+            addError("END OF EXPRESSION", currentToken.line(), currentToken.column());
         }
         else {
             tokens.previous();
@@ -186,7 +190,7 @@ public class Parser {
     private void prodComplexExpression() throws Exception {
 
         if (!(currentToken.type() == TokenType.INTEGERLITERAL || currentToken.type() == TokenType.IDENTIFIER))
-            addError("EXPRESSION", currentToken.position());
+            addError("EXPRESSION", currentToken.line(), currentToken.column());
 
         advance();
         if (currentToken.type() == TokenType.LOWERT ||

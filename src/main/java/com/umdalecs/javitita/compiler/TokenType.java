@@ -21,6 +21,16 @@ public enum TokenType {
   LBRACE, RBRACE,
 
   // Keywords
-  WHILE, BOOLEAN, INTEGER, VOID, TRUE, FALSE, PRINTSTATEMENT, CLASS
-}
+  WHILE, BOOLEAN, INTEGER, VOID, TRUE, FALSE, PRINTSTATEMENT, CLASS;
+  // KEYWORD
 
+  public String tokenName() {
+    return switch (this) {
+      case WHILE, BOOLEAN, INTEGER,
+          VOID, TRUE, FALSE,
+          PRINTSTATEMENT, CLASS ->
+        "KEYWORD";
+      default -> name();
+    };
+  }
+}

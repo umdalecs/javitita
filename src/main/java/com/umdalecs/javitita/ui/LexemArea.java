@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.uiv1;
+package com.umdalecs.javitita.ui;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -9,7 +9,6 @@ public class LexemArea extends JPanel {
 
     public LexemArea() {
         super(new BorderLayout());
-        // setBorder(BorderFactory.createTitledBorder("Zona de Lexemas y Componentes Léxicos"));
 
         String[] columnas = {"Lexema", "Componente Léxico"};
         Object[][] datos = {};
