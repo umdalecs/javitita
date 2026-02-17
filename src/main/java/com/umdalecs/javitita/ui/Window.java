@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import com.umdalecs.javitita.compiler.Scanner;
+import com.umdalecs.javitita.compiler.Parser;
 import com.umdalecs.javitita.compiler.Symbol;
 import com.umdalecs.javitita.compiler.Token;
 import com.umdalecs.javitita.compiler.TokenType;
@@ -15,15 +16,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Window extends JFrame implements ComponentListener {
     private final CodeArea codeArea;
+    private final JButton lexerButton, parserButton;
     private final LexemArea lexemArea;
-    private final JButton lexerButton;
-    private final JButton parserButton;
+    private final ErrorArea errorArea;
 
     private List<Token> tokens;
     private Map<String, Symbol> symbols;
@@ -31,16 +33,18 @@ public class Window extends JFrame implements ComponentListener {
     List<String> parserErrors;
 
     public Window() {
-        setTitle("Compilador javita");
+        setTitle("Compilador javitita");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(null);
 
         add(codeArea = new CodeArea());
         add(lexerButton = new JButton("Análisis léxico"));
         add(lexemArea = new LexemArea());
+        add(errorArea = new ErrorArea());
         add(parserButton =  new JButton("Análisis sintáctico"));
 
         lexerButton.addActionListener(new LexerActionPerformer());
+        parserButton.addActionListener(new ParseActionPerformer());
 
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -73,6 +77,13 @@ public class Window extends JFrame implements ComponentListener {
                 (int) (this.getHeight() * .05 + 25),
                 (int) (this.getWidth() * .20),
                 (int) ((this.getHeight() * .5) - ((this.getHeight() * .05) + 25)));
+
+        errorArea.setBounds(
+                (int) (this.getWidth() * .5) + 10 + (int) (this.getWidth() * .20),
+                (int) (this.getHeight() * .05 + 25),
+                (int) (this.getWidth() * .20),
+                (int) ((this.getHeight() * .5) - ((this.getHeight() * .05) + 25)));
+
 
         validate();
     }
@@ -129,6 +140,17 @@ public class Window extends JFrame implements ComponentListener {
                 }
                 tokens.add(token);
             }
+        }
+    }
+
+    class ParseActionPerformer implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            var symbols = new HashMap<String, Symbol>();
+            var parser = new Parser(tokens, symbols);
+            parser.parse();
+
+            var errors = parser.getErrors();
         }
     }
 }
