@@ -1,6 +1,6 @@
 package com.umdalecs.javitita;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.umdalecs.javitita.ui.Window;
 
