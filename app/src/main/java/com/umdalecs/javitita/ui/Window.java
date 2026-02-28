@@ -23,7 +23,7 @@ import java.util.Map;
 
 public class Window extends JFrame implements ComponentListener {
     private final CodeArea codeArea;
-    private final JButton lexerButton, parserButton;
+    private final JButton lexerButton, parserButton, semButton;
     private final LexemArea lexemArea;
     private final ErrorArea errorArea;
 
@@ -42,9 +42,40 @@ public class Window extends JFrame implements ComponentListener {
         add(lexemArea = new LexemArea());
         add(errorArea = new ErrorArea());
         add(parserButton =  new JButton("Análisis sintáctico"));
+        add(semButton =  new JButton("Análisis semántico"));
 
-        lexerButton.addActionListener(new LexerActionPerformer());
-        parserButton.addActionListener(new ParseActionPerformer());
+        lexerButton.addActionListener((e -> {
+            symbols = new LinkedHashMap<>();
+            tokens = new ArrayList<>();
+
+            var lexer = new Scanner(codeArea.getText());
+
+            while (true) {
+                Token token = lexer.nextToken();
+
+                switch (token.type()) {
+                    case IDENTIFIER -> {
+                        symbols.put(token.literal(), new Symbol(token.literal(), "", "", token.line(), token.column()));
+                    }
+                    case EOF -> {
+                        updateInterface();
+                        tokens.add(token);
+                        return;
+                    }
+                    default -> {
+                    }
+                }
+                tokens.add(token);
+            }
+        }));
+        parserButton.addActionListener(e -> {
+            var symbols = new HashMap<String, Symbol>();
+            var parser = new Parser(tokens, symbols);
+            parser.parse();
+
+            var errors = parser.getErrors();
+        });
+        semButton.addActionListener(e -> {});
 
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -56,34 +87,32 @@ public class Window extends JFrame implements ComponentListener {
         codeArea.setBounds(
                 10,
                 10,
-                (int) (this.getWidth() * .5),
-                (int) (this.getHeight() * .5));
+                (int) (getWidth() * .5),
+                (int) (getHeight() * .5));
 
         lexerButton.setBounds(
-                (int) (this.getWidth() * .5) + 10,
+                (int) (getWidth() * .5) + 10,
                 25,
-                (int) (this.getWidth() * .20),
-                (int) (this.getHeight() * .05));
-
-        parserButton.setBounds(
-                (int) (this.getWidth() * .5) + 10 + (int) (this.getWidth() * .20),
-                25,
-                (int) (this.getWidth() * .20),
-                (int) (this.getHeight() * .05));
-
+                (int) (getWidth() * .20),
+                (int) (getHeight() * .05));
 
         lexemArea.setBounds(
-                (this.getWidth() / 2) + 10,
-                (int) (this.getHeight() * .05 + 25),
-                (int) (this.getWidth() * .20),
-                (int) ((this.getHeight() * .5) - ((this.getHeight() * .05) + 25)));
+                (getWidth() / 2) + 10,
+                (int) (getHeight() * .05 + 25),
+                (int) (getWidth() * .20),
+                (int) ((getHeight() * .5) - ((getHeight() * .05) + 25)));
+
+        parserButton.setBounds(
+                (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20),
+                25,
+                getWidth() - ((getWidth() / 2) + 10 + (int)(getWidth() * .20)) - 10,
+                (int) (getHeight() * .05));
 
         errorArea.setBounds(
-                (int) (this.getWidth() * .5) + 10 + (int) (this.getWidth() * .20),
-                (int) (this.getHeight() * .05 + 25),
-                (int) (this.getWidth() * .20),
-                (int) ((this.getHeight() * .5) - ((this.getHeight() * .05) + 25)));
-
+                (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20),
+                (int) (getHeight() * .05 + 25),
+                getWidth() - ((getWidth() / 2) + 10 + (int)(getWidth() * .20)) - 10,
+                (int) ((getHeight() * .5) - ((getHeight() * .05) + 25)));
 
         validate();
     }
@@ -113,44 +142,5 @@ public class Window extends JFrame implements ComponentListener {
             }
 
         });
-    }
-
-    class LexerActionPerformer implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            symbols = new LinkedHashMap<>();
-            tokens = new ArrayList<>();
-
-            var lexer = new Scanner(codeArea.getText());
-
-            while (true) {
-                Token token = lexer.nextToken();
-
-                switch (token.type()) {
-                    case IDENTIFIER -> {
-                        symbols.put(token.literal(), new Symbol(token.literal(), "", "", token.line(), token.column()));
-                    }
-                    case EOF -> {
-                        updateInterface();
-                        tokens.add(token);
-                        return;
-                    }
-                    default -> {
-                    }
-                }
-                tokens.add(token);
-            }
-        }
-    }
-
-    class ParseActionPerformer implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            var symbols = new HashMap<String, Symbol>();
-            var parser = new Parser(tokens, symbols);
-            parser.parse();
-
-            var errors = parser.getErrors();
-        }
     }
 }
