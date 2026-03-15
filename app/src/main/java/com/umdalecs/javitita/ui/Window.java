@@ -1,25 +1,23 @@
 package com.umdalecs.javitita.ui;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import com.umdalecs.javitita.compiler.Scanner;
-import com.umdalecs.javitita.compiler.Parser;
-import com.umdalecs.javitita.compiler.Symbol;
-import com.umdalecs.javitita.compiler.Token;
-import com.umdalecs.javitita.compiler.TokenType;
+import com.umdalecs.javitita.compiler.ErrorHandler;
+import com.umdalecs.javitita.compiler.lexer.Scanner;
+import com.umdalecs.javitita.compiler.parser.ParseError;
+import com.umdalecs.javitita.compiler.parser.Parser;
+import com.umdalecs.javitita.compiler.lexer.Token;
+import com.umdalecs.javitita.compiler.lexer.TokenType;
 
 import javax.swing.JButton;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Window extends JFrame implements ComponentListener {
     private final CodeArea codeArea;
@@ -28,9 +26,6 @@ public class Window extends JFrame implements ComponentListener {
     private final ErrorArea errorArea;
 
     private List<Token> tokens;
-    private Map<String, Symbol> symbols;
-
-    List<String> parserErrors;
 
     public Window() {
         setTitle("Compilador javitita");
@@ -41,41 +36,68 @@ public class Window extends JFrame implements ComponentListener {
         add(lexerButton = new JButton("Análisis léxico"));
         add(lexemArea = new LexemArea());
         add(errorArea = new ErrorArea());
-        add(parserButton =  new JButton("Análisis sintáctico"));
-        add(semButton =  new JButton("Análisis semántico"));
+        add(parserButton = new JButton("Análisis sintáctico"));
+        add(semButton = new JButton("Análisis semántico"));
 
         lexerButton.addActionListener((e -> {
-            symbols = new LinkedHashMap<>();
+            var errorHandler = new ErrorHandler();
             tokens = new ArrayList<>();
 
-            var lexer = new Scanner(codeArea.getText());
+            var lexer = new Scanner(codeArea.getText(), errorHandler);
 
-            while (true) {
-                Token token = lexer.nextToken();
-
-                switch (token.type()) {
-                    case IDENTIFIER -> {
-                        symbols.put(token.literal(), new Symbol(token.literal(), "", "", token.line(), token.column()));
-                    }
-                    case EOF -> {
-                        updateInterface();
-                        tokens.add(token);
-                        return;
-                    }
-                    default -> {
-                    }
-                }
+            Token token;
+            do {
+                token = lexer.nextToken();
                 tokens.add(token);
-            }
+            } while (token.type() != TokenType.EOF);
+
+            SwingUtilities.invokeLater(() -> {
+                lexemArea.reset();
+
+                for (Token t : tokens) {
+                    switch (t.type()) {
+                        case ILLEGAL -> codeArea.markError(t);
+                        case WHILE, BOOLEAN_TYPE, INTEGER_TYPE,
+                             TRUE_LITERAL, FALSE_LITERAL, FN,
+                             PRINT_STATEMENT -> codeArea.markKeyword(t);
+                        case INTEGER_LITERAL -> codeArea.markInteger(t);
+                        case IDENTIFIER -> codeArea.markIdent(t);
+                    }
+                    Object[] row = {t.literal(), t.type().tokenName()};
+                    lexemArea.addRow(row);
+                }
+
+                parserButton.setEnabled(errorHandler.getErrors().isEmpty());
+
+                updateErrors(errorHandler);
+            });
         }));
         parserButton.addActionListener(e -> {
-            var symbols = new HashMap<String, Symbol>();
-            var parser = new Parser(tokens, symbols);
-            parser.parse();
+            var errorHandler = new ErrorHandler();
+            var scanner = new Scanner(codeArea.getText(), errorHandler);
+            var parser = new Parser(scanner, errorHandler);
 
-            var errors = parser.getErrors();
+            var ast = parser.parse();
+
+            SwingUtilities.invokeLater(() -> {
+                semButton.setEnabled(errorHandler.getErrors().isEmpty());
+
+                updateErrors(errorHandler);
+            });
+
+            ObjectMapper mapper = new ObjectMapper();
+
+            String json = null;
+            try {
+                json = mapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(ast);
+            } catch (JsonProcessingException ignored) {}
+
+            System.out.println(json);
         });
-        semButton.addActionListener(e -> {});
+        semButton.addActionListener(e -> {
+        });
 
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -84,35 +106,38 @@ public class Window extends JFrame implements ComponentListener {
 
     @Override
     public void componentResized(ComponentEvent e) {
-        codeArea.setBounds(
-                10,
-                10,
-                (int) (getWidth() * .5),
-                (int) (getHeight() * .5));
+        int x, y, w, h;
 
-        lexerButton.setBounds(
-                (int) (getWidth() * .5) + 10,
-                25,
-                (int) (getWidth() * .20),
-                (int) (getHeight() * .05));
+        x = 10;
+        y = 10;
+        w = (int) (getWidth() * .5);
+        h = (int) (getHeight() * .5);
+        codeArea.setBounds(x, y, w, h);
 
-        lexemArea.setBounds(
-                (getWidth() / 2) + 10,
-                (int) (getHeight() * .05 + 25),
-                (int) (getWidth() * .20),
-                (int) ((getHeight() * .5) - ((getHeight() * .05) + 25)));
+        x = x + w;
+        y = y + 15;
+        w = (int) (getWidth() * .2);
+        h = (int) (getHeight() * .05);
+        lexerButton.setBounds(x, y, w, h);
 
-        parserButton.setBounds(
-                (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20),
-                25,
-                getWidth() - ((getWidth() / 2) + 10 + (int)(getWidth() * .20)) - 10,
-                (int) (getHeight() * .05));
+        x = x + w;
+        w = getWidth() - (int) (getWidth() * .7) - 20;
+        parserButton.setBounds(x, y, w, h);
 
-        errorArea.setBounds(
-                (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20),
-                (int) (getHeight() * .05 + 25),
-                getWidth() - ((getWidth() / 2) + 10 + (int)(getWidth() * .20)) - 10,
-                (int) ((getHeight() * .5) - ((getHeight() * .05) + 25)));
+        y = y + h;
+        semButton.setBounds(x, y, w, h);
+
+        x = (getWidth() / 2) + 10;
+        y = (int) (getHeight() * .05 + 25);
+        w = (int) (getWidth() * .20);
+        h = (int) ((getHeight() * .5) - ((getHeight() * .05) + 25));
+        lexemArea.setBounds(x, y, w, h);
+
+        x = (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20);
+        y = y + (int) (getHeight() * .05);
+        w = getWidth() - (int) (getWidth() * .7) - 20;
+        h = h - (int) (getHeight() * .05);
+        errorArea.setBounds(x, y, w, h);
 
         validate();
     }
@@ -129,18 +154,17 @@ public class Window extends JFrame implements ComponentListener {
     public void componentHidden(ComponentEvent e) {
     }
 
-    void updateInterface() {
-        SwingUtilities.invokeLater(() -> {
-            lexemArea.reset();
-
-            for (Token token : tokens) {
-                if (token.type() == TokenType.ILLEGAL) {
-                    codeArea.underlineText(token.absolutePos(), token.literal().length());
+    private void updateErrors(ErrorHandler errorHandler) {
+        if (!errorHandler.getErrors().isEmpty()) {
+            var sb = new StringBuilder();
+            for (var error : errorHandler.getErrors()) {
+                if (error instanceof ParseError pe) {
+                    codeArea.markMissing(pe.getToken().absolutePos() - 1);
                 }
-                Object[] row = { token.literal(), token.type().tokenName() };
-                lexemArea.addRow(row);
+                sb.append(error.getMessage()).append("\n");
             }
 
-        });
+            errorArea.setText(sb.toString());
+        } else errorArea.setText("No se encontraron errores");
     }
 }

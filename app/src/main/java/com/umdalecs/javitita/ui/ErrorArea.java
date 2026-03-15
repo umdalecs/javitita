@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -13,30 +12,20 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 public class ErrorArea extends JPanel {
-    private final JTextPane codeField;
+    private final JTextPane textField;
     public ErrorArea() {
         super(new BorderLayout());
-        // setBorder(BorderFactory.createTitledBorder("Programa:"));
 
-        codeField = new JTextPane();
-        codeField.setEditable(false);
+        textField = new JTextPane();
+        textField.setEditable(false);
 
-        codeField.setFont(new Font("Fira Code", Font.PLAIN,42));
-        var scrollPane = new JScrollPane(codeField);
+        textField.setFont(new Font("Hack", Font.PLAIN,42));
+        var scrollPane = new JScrollPane(textField);
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    public String getText() {
-        return codeField.getText();
+    public void setText(String text) {
+        textField.setText(text);
     }
 
-    public void underlineText(int absolutePos, int length) {
-        StyledDocument doc = codeField.getStyledDocument();
-
-        Style style = codeField.addStyle("UnderlineStyle", null);
-        StyleConstants.setUnderline(style, true);
-        StyleConstants.setForeground(style, Color.RED);
-
-        doc.setCharacterAttributes(absolutePos, length, style, false);
-    }
 }

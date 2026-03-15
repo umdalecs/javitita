@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.compiler;
+package com.umdalecs.javitita.compiler.lexer;
 
 public enum TokenType {
   EOF,
@@ -8,11 +8,11 @@ public enum TokenType {
 
   // Identifiers, Literals
   IDENTIFIER,
-  INTEGERLITERAL,
+  INTEGER_LITERAL,
 
   // Operators
-  ASSIGN, MULT,
-  LOWERT,
+  ASSIGN, MULTI,
+  LOWER_THAN,
   PLUS,
   MINUS,
 
@@ -21,14 +21,13 @@ public enum TokenType {
   LBRACE, RBRACE,
 
   // Keywords
-  WHILE, BOOLEAN, INTEGER, VOID, TRUE, FALSE, PRINTSTATEMENT, CLASS;
-  // KEYWORD
+  WHILE, BOOLEAN_TYPE, INTEGER_TYPE, TRUE_LITERAL, FALSE_LITERAL, PRINT_STATEMENT, FN;
 
   public String tokenName() {
     return switch (this) {
-      case WHILE, BOOLEAN, INTEGER,
-          VOID, TRUE, FALSE,
-          PRINTSTATEMENT, CLASS ->
+      case WHILE, BOOLEAN_TYPE, INTEGER_TYPE,
+           TRUE_LITERAL, FALSE_LITERAL,
+           PRINT_STATEMENT ->
         "KEYWORD";
       default -> name();
     };
