@@ -1,6 +1,8 @@
 package com.umdalecs.javitita.compiler;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SymbolTable {
@@ -21,6 +23,10 @@ public class SymbolTable {
 
     public Symbol getSymbol(String key) {
         return symbols.get(key);
+    }
+
+    public Collection<Symbol> getValues() {
+        return symbols.values();
     }
 
 }
