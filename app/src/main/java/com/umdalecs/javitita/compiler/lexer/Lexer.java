@@ -2,16 +2,14 @@ package com.umdalecs.javitita.compiler.lexer;
 
 import com.umdalecs.javitita.compiler.ErrorHandler;
 
-import java.util.List;
-
-public class Scanner {
+public class Lexer {
     private final String input;
     private final ErrorHandler errorHandler;
     private int position, readPosition, line, column;
     private char currentChar;
 
 
-    public Scanner(String input, ErrorHandler errorHandler) {
+    public Lexer(String input, ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
         this.input = input;
         this.position = this.readPosition = 0;

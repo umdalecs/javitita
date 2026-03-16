@@ -1,7 +1,7 @@
 package com.umdalecs.javitita.compiler.parser;
 
 import com.umdalecs.javitita.compiler.ErrorHandler;
-import com.umdalecs.javitita.compiler.lexer.Scanner;
+import com.umdalecs.javitita.compiler.lexer.Lexer;
 import com.umdalecs.javitita.compiler.lexer.Token;
 import com.umdalecs.javitita.compiler.lexer.TokenType;
 import com.umdalecs.javitita.compiler.parser.statements.*;
@@ -14,24 +14,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Parser {
-    private final Scanner scanner;
+    private final Lexer lexer;
     private final ErrorHandler errorHandler;
 
     private Token currentToken, peekToken;
 
 
-    public Parser(Scanner scanner, ErrorHandler errorHandler) {
+    public Parser(Lexer lexer, ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
-        this.scanner = scanner;
+        this.lexer = lexer;
 
-        currentToken = scanner.nextToken();
-        peekToken = scanner.nextToken();
+        currentToken = lexer.nextToken();
+        peekToken = lexer.nextToken();
     }
 
     private void nextToken() {
         System.out.println(currentToken);
         currentToken = peekToken;
-        peekToken = scanner.nextToken();
+        peekToken = lexer.nextToken();
     }
 
     public Program parse() {
@@ -118,7 +118,7 @@ public class Parser {
     }
 
     private VarAssignStatement parseVarAssign() {
-        var identifier = new Identifier(currentToken);
+        var identifier = currentToken;
         nextToken();
 
         if (errorHandler.expectToken(currentToken, TokenType.ASSIGN))
@@ -139,7 +139,7 @@ public class Parser {
         };
 
         if (errorHandler.expectToken(currentToken, TokenType.IDENTIFIER)) {
-            var identifier = new Identifier(currentToken);
+            var identifier = currentToken;
             nextToken();
 
             return new VarDeclarationStatement(identifier, tp);

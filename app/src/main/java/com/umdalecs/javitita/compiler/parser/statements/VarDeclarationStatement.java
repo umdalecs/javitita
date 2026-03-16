@@ -1,15 +1,14 @@
 package com.umdalecs.javitita.compiler.parser.statements;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.umdalecs.javitita.compiler.parser.Identifier;
+import com.umdalecs.javitita.compiler.lexer.Token;
 import com.umdalecs.javitita.compiler.parser.Type;
 import com.umdalecs.javitita.compiler.parser.syntaxtree.Statement;
 
 public class VarDeclarationStatement extends Statement {
     private Type type;
-    private Identifier identifier;
+    private Token identifier;
 
-    public VarDeclarationStatement(Identifier identifier,  Type type) {
+    public VarDeclarationStatement(Token identifier, Type type) {
         this.identifier = identifier;
         this.type = type;
     }
@@ -18,7 +17,7 @@ public class VarDeclarationStatement extends Statement {
         return type;
     }
 
-    public Identifier getIdentifier() {
+    public Token getIdentifier() {
         return identifier;
     }
 }

@@ -2,28 +2,30 @@ package com.umdalecs.javitita.ui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+
+import javax.swing.*;
 
 import com.umdalecs.javitita.compiler.ErrorHandler;
-import com.umdalecs.javitita.compiler.lexer.Scanner;
+import com.umdalecs.javitita.compiler.lexer.Lexer;
 import com.umdalecs.javitita.compiler.parser.ParseError;
 import com.umdalecs.javitita.compiler.parser.Parser;
 import com.umdalecs.javitita.compiler.lexer.Token;
 import com.umdalecs.javitita.compiler.lexer.TokenType;
 
-import javax.swing.JButton;
-
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Window extends JFrame implements ComponentListener {
     private final CodeArea codeArea;
-    private final JButton lexerButton, parserButton, semButton;
+    private final JButton lexerButton, parserButton, semButton, interButton;
     private final LexemArea lexemArea;
     private final ErrorArea errorArea;
+    private final IntermediateCodeArea intermediateCodeArea;
 
     private List<Token> tokens;
 
@@ -38,12 +40,56 @@ public class Window extends JFrame implements ComponentListener {
         add(errorArea = new ErrorArea());
         add(parserButton = new JButton("Análisis sintáctico"));
         add(semButton = new JButton("Análisis semántico"));
+        add(interButton = new JButton("Código intermedio"));
+        add(intermediateCodeArea = new IntermediateCodeArea());
+
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu archiveMenu = new JMenu("\uD83D\uDCC2 Archivo");
+
+        JMenuItem load = new JMenuItem("\uD83D\uDCC4 Abrir");
+        JMenuItem save = new JMenuItem("\uD83D\uDCC4 Guardar");
+
+        archiveMenu.add(load);
+        archiveMenu.add(save);
+        menuBar.add(archiveMenu);
+
+        setJMenuBar(menuBar);
+
+        load.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+
+            int result = fileChooser.showOpenDialog(null);
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File archive = fileChooser.getSelectedFile();
+                try {
+                    var fileContent = Files.readString(archive.toPath());
+                    codeArea.setText(fileContent);
+                }catch (Exception ignored){}
+            }
+        });
+
+        save.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+
+            int result = fileChooser.showOpenDialog(null);
+
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File archive = fileChooser.getSelectedFile();
+                try {
+                    FileWriter writer = new FileWriter(archive);
+                    writer.write(codeArea.getText());
+                    writer.close();
+                }catch (Exception ignored){}
+            }
+        });
 
         lexerButton.addActionListener((e -> {
             var errorHandler = new ErrorHandler();
             tokens = new ArrayList<>();
 
-            var lexer = new Scanner(codeArea.getText(), errorHandler);
+            var lexer = new Lexer(codeArea.getText(), errorHandler);
 
             Token token;
             do {
@@ -74,8 +120,8 @@ public class Window extends JFrame implements ComponentListener {
         }));
         parserButton.addActionListener(e -> {
             var errorHandler = new ErrorHandler();
-            var scanner = new Scanner(codeArea.getText(), errorHandler);
-            var parser = new Parser(scanner, errorHandler);
+            var lexer = new Lexer(codeArea.getText(), errorHandler);
+            var parser = new Parser(lexer, errorHandler);
 
             var ast = parser.parse();
 
@@ -97,6 +143,10 @@ public class Window extends JFrame implements ComponentListener {
             System.out.println(json);
         });
         semButton.addActionListener(e -> {
+
+        });
+        interButton.addActionListener(e -> {
+
         });
 
         setLocationRelativeTo(null);
@@ -138,6 +188,16 @@ public class Window extends JFrame implements ComponentListener {
         w = getWidth() - (int) (getWidth() * .7) - 20;
         h = h - (int) (getHeight() * .05);
         errorArea.setBounds(x, y, w, h);
+
+        x = 10;
+        y = (int) (getWidth() * .5) + 10;
+        w = (int) (getWidth() * .4);
+        h = (int) (getWidth() * .05);
+        interButton.setBounds(x, y, w, h);
+
+        y = y + h + 10;
+        h = (int) (getWidth() * .5) - 20 - h;
+        intermediateCodeArea.setBounds(x, y, w, h);
 
         validate();
     }

@@ -44,6 +44,10 @@ public class CodeArea extends JPanel {
         return codeField.getText();
     }
 
+    public void setText(String text) {
+        codeField.setText(text);
+    }
+
 //    public void resetStyles() {
 //        StyledDocument doc = codeField.getStyledDocument();
 //        Style defaultStyle = StyleContext.getDefaultStyleContext()
