@@ -1,15 +1,11 @@
 package com.umdalecs.javitita.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
+import javax.swing.*;
+import java.awt.*;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-
-public class ErrorArea extends JPanel {
+public class IntermediateCodeArea  extends JPanel {
     private final JTextPane textField;
-    public ErrorArea() {
+    public IntermediateCodeArea() {
         super(new BorderLayout());
 
         textField = new JTextPane();
