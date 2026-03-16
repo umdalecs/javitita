@@ -11,12 +11,12 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 public class CodeArea extends JPanel {
     private final JTextPane codeField;
     private final JTextArea lineNumbers;
+
     public CodeArea() {
         super(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder("Programa:"));

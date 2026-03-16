@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Window extends JFrame implements ComponentListener {
+public class Window extends JFrame {
     private final CodeArea codeArea;
     private final JButton lexerButton, parserButton, semButton, interButton;
     private final LexemArea lexemArea;
@@ -192,67 +192,67 @@ public class Window extends JFrame implements ComponentListener {
 
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
-        addComponentListener(this);
-    }
+        addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                int x, y, w, h;
 
-    @Override
-    public void componentResized(ComponentEvent e) {
-        int x, y, w, h;
+                x = 10;
+                y = 10;
+                w = (int) (getWidth() * .5);
+                h = (int) (getHeight() * .5);
+                codeArea.setBounds(x, y, w, h);
 
-        x = 10;
-        y = 10;
-        w = (int) (getWidth() * .5);
-        h = (int) (getHeight() * .5);
-        codeArea.setBounds(x, y, w, h);
+                x = x + w;
+                y = y + 15;
+                w = (int) (getWidth() * .2);
+                h = (int) (getHeight() * .05);
+                lexerButton.setBounds(x, y, w, h);
 
-        x = x + w;
-        y = y + 15;
-        w = (int) (getWidth() * .2);
-        h = (int) (getHeight() * .05);
-        lexerButton.setBounds(x, y, w, h);
+                x = x + w;
+                w = getWidth() - (int) (getWidth() * .7) - 20;
+                parserButton.setBounds(x, y, w, h);
 
-        x = x + w;
-        w = getWidth() - (int) (getWidth() * .7) - 20;
-        parserButton.setBounds(x, y, w, h);
+                y = y + h;
+                semButton.setBounds(x, y, w, h);
 
-        y = y + h;
-        semButton.setBounds(x, y, w, h);
+                x = (getWidth() / 2) + 10;
+                y = (int) (getHeight() * .05 + 25);
+                w = (int) (getWidth() * .20);
+                h = (int) ((getHeight() * .5) - ((getHeight() * .05) + 25));
+                lexemArea.setBounds(x, y, w, h);
 
-        x = (getWidth() / 2) + 10;
-        y = (int) (getHeight() * .05 + 25);
-        w = (int) (getWidth() * .20);
-        h = (int) ((getHeight() * .5) - ((getHeight() * .05) + 25));
-        lexemArea.setBounds(x, y, w, h);
+                x = (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20);
+                y = y + (int) (getHeight() * .05);
+                w = getWidth() - (int) (getWidth() * .7) - 20;
+                h = h - (int) (getHeight() * .05);
+                errorArea.setBounds(x, y, w, h);
 
-        x = (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20);
-        y = y + (int) (getHeight() * .05);
-        w = getWidth() - (int) (getWidth() * .7) - 20;
-        h = h - (int) (getHeight() * .05);
-        errorArea.setBounds(x, y, w, h);
+                x = 10;
+                y = (int) (getHeight() * .5) + 10;
+                w = (int) (getWidth() * .4);
+                h = (int) (getHeight() * .05);
+                interButton.setBounds(x, y, w, h);
 
-        x = 10;
-        y = (int) (getHeight() * .5) + 10;
-        w = (int) (getWidth() * .4);
-        h = (int) (getHeight() * .05);
-        interButton.setBounds(x, y, w, h);
+                y = y + h;
+                h = (int) (getHeight() * .5) - 60 - h;
+                intermediateCodeArea.setBounds(x, y, w, h);
 
-        y = y + h;
-        h = (int) (getHeight() * .5) - 60 - h;
-        intermediateCodeArea.setBounds(x, y, w, h);
+                validate();
+            }
 
-        validate();
-    }
+            @Override
+            public void componentMoved(ComponentEvent e) {
+            }
 
-    @Override
-    public void componentMoved(ComponentEvent e) {
-    }
+            @Override
+            public void componentShown(ComponentEvent e) {
+            }
 
-    @Override
-    public void componentShown(ComponentEvent e) {
-    }
-
-    @Override
-    public void componentHidden(ComponentEvent e) {
+            @Override
+            public void componentHidden(ComponentEvent e) {
+            }
+        });
     }
 
     private void updateErrors(ErrorHandler errorHandler) {
