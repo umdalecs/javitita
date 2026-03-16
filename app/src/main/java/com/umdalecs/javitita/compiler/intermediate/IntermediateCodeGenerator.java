@@ -67,20 +67,21 @@ public class IntermediateCodeGenerator {
                 String e1 = "E" + contadorEtiqueta++;
                 String e2 = "E" + contadorEtiqueta++;
 
+                builder.append(String.format("%s:\n", e1));
+
                 var result = checkExpressionResult(ws.getCondition());
 
                 builder.append(String.format("""
-                        %s:
                                    CMP            %s, 0
                                    JE             %s
-                        """, e1, result, e2));
+                        """, result, e2));
 
                 for (var statement: ws.getStatements()) {
                     generateStatement(statement);
                 }
 
                 builder.append(String.format("""
-                                   JP             %s
+                                   JMP            %s
                         %s:
                         """, e1, e2));
 
@@ -108,6 +109,13 @@ public class IntermediateCodeGenerator {
                                    MOV            AH, 02H
                                    INT            21H
                                    LOOP           %s
+                                   MOV            AH, 02h
+                                   MOV            DL, 13     ; CR
+                                   INT            21h
+                        
+                                   MOV            AH, 02h
+                                   MOV            DL, 10     ; LF
+                                   INT            21h
                         """;
                 builder.append(String.format(format,
                         result,
@@ -144,13 +152,21 @@ public class IntermediateCodeGenerator {
                         ? "WORD PTR [" + expression.getRight().literal() + "]"
                         : expression.getRight().literal();
 
+                String e1 = "E" + contadorEtiqueta++;
+                String e2 = "E" + contadorEtiqueta++;
+
                 if (expression.getOperation().type() == TokenType.LOWER_THAN) {
                     builder.append(String.format("""
                                        MOV            AX, %s
                                        MOV            BX, %s
                                        CMP            AX, BX
-                                       SETL           AX
-                            """, left, right));
+                                       JL             %s
+                                       MOV            AX, 0
+                                       JMP            %s
+                            %s:
+                                       MOV            AX, 1
+                            %s:
+                            """, left, right, e1, e2, e1, e2));
                 }
                 return "AX";
             }
