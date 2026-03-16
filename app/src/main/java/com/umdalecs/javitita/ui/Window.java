@@ -12,6 +12,7 @@ import com.umdalecs.javitita.compiler.parser.Parser;
 import com.umdalecs.javitita.compiler.lexer.Token;
 import com.umdalecs.javitita.compiler.lexer.TokenType;
 import com.umdalecs.javitita.compiler.semantic.Semantic;
+import com.umdalecs.javitita.compiler.intermediate.IntermediateCodeGenerator;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -182,12 +183,32 @@ public class Window extends JFrame {
         });
 
         interButton.addActionListener(e -> {
+            var errorHandler = new ErrorHandler();
+            var lexer = new Lexer(codeArea.getText(), errorHandler);
+            var parser = new Parser(lexer, errorHandler);
 
+            var ast = parser.parse();
+
+            var symbolTable = new SymbolTable();
+
+            var sem = new Semantic(ast, errorHandler, symbolTable);
+
+            sem.CheckSemantics();
+
+            var intermediateCodeGenerator = new IntermediateCodeGenerator(symbolTable, ast);
+
+            var intermediateCode = intermediateCodeGenerator.generate();
+
+            SwingUtilities.invokeLater(() -> {
+                // Here will be the object code button
+                // interButton.setEnabled(errorHandler.getErrors().isEmpty());
+                intermediateCodeArea.setText(intermediateCode);
+
+                updateErrors(errorHandler);
+            });
         });
 
-        // 1. Establece un tamaño base al que la ventana regresará cuando la muevas
         setSize(1024, 768);
-        // 2. Establece un límite para que el usuario no pueda hacerla demasiado pequeña
         setMinimumSize(new java.awt.Dimension(1280, 720));
 
         setLocationRelativeTo(null);
