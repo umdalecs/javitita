@@ -102,11 +102,11 @@ public class Semantic {
      * @return the {@link Type} of the expression.
      */
     private Type checkExpressionType(Expression expression) {
-        // In case it is TRUE, FALSE, INTEGER_LITERAL
+        // In case left is TRUE, FALSE, INTEGER_LITERAL
         if (expression.getType() != null)
             return expression.getType();
 
-        // In case left is an identifier
+        // In case left is IDENTIFIER
         if (expression.getOperation() == null) {
             var type = checkIdentifierType(expression.getLeft());
             expression.setType(type);
