@@ -5,8 +5,7 @@ import com.umdalecs.javitita.compiler.parser.Type;
 
 public class Expression {
     private Type type;
-    private Token operation;
-    private Token left, right;
+    private final Token operation, left, right;
 
     public Expression(Type type, Token operation, Token left, Token right) {
         this.type = type;
@@ -18,6 +17,7 @@ public class Expression {
     public Expression(Type type, Token left) {
         this.type = type;
         this.left = left;
+        operation=right=null;
     }
 
     public Type getType() {

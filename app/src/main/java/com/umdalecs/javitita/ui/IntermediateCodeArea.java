@@ -11,7 +11,7 @@ public class IntermediateCodeArea  extends JPanel {
         textField = new JTextPane();
         textField.setEditable(false);
 
-        textField.setFont(new Font("Hack", Font.PLAIN,42));
+        textField.setFont(new Font("Hack", Font.PLAIN,28));
         var scrollPane = new JScrollPane(textField);
         add(scrollPane, BorderLayout.CENTER);
     }

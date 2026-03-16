@@ -17,6 +17,8 @@ public class LexemArea extends JPanel {
         var lexemasTable = new JTable(lexemModel);
         var scrollPane = new JScrollPane(lexemasTable);
 
+        lexemasTable.setFont(new Font("Hack", Font.PLAIN,20));
+
         add(scrollPane, BorderLayout.CENTER);
     }
 

@@ -1,4 +1,5 @@
-# Javitita - compiler
+# Javitita - compiler and GUI
 
-Proyecto de Lenguajes y Automatas II, interfaz grafica para
-un compilador de la siguiente gramatica
+Proyecto de Lenguajes y Autómatas II, interfaz gráfica para
+un compilador de la siguiente gramática
+

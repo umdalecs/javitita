@@ -4,6 +4,7 @@ import com.umdalecs.javitita.compiler.lexer.LexicalError;
 import com.umdalecs.javitita.compiler.lexer.Token;
 import com.umdalecs.javitita.compiler.lexer.TokenType;
 import com.umdalecs.javitita.compiler.parser.ParseError;
+import com.umdalecs.javitita.compiler.semantic.SemanticError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,5 +53,9 @@ public class ErrorHandler {
             errors.add(new ParseError(expectedTokenName.toString(), token));
         }
         return flag;
+    }
+
+    public void addSemanticError(String msg) {
+        errors.add(new SemanticError(msg));
     }
 }
