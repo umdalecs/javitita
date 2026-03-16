@@ -29,7 +29,6 @@ public class Parser {
     }
 
     private void nextToken() {
-        System.out.println(currentToken);
         currentToken = peekToken;
         peekToken = lexer.nextToken();
     }
@@ -171,13 +170,20 @@ public class Parser {
     private Expression parseExpression() {
         Token left;
 
-        if (currentToken.type() == TokenType.IDENTIFIER) {
+        var tp = switch (currentToken.type()) {
+            case INTEGER_LITERAL -> Type.INTEGER;
+            case TRUE_LITERAL, FALSE_LITERAL -> Type.BOOLEAN;
+            default -> null;
+        };
+
+        if (currentToken.type() == TokenType.IDENTIFIER
+            || currentToken.type() == TokenType.INTEGER_LITERAL) {
             left = currentToken;
             nextToken();
 
             switch (currentToken.type()) {
                 case SEMICOLON, RPAREN -> {
-                    return new Expression(null, left);
+                    return new Expression(tp, left);
                 }
                 case PLUS, MINUS, MULTI -> {
                     Token operation = currentToken;
@@ -189,7 +195,7 @@ public class Parser {
                     ))) {
                         var tmp = currentToken;
                         nextToken();
-                        return new Expression(Type.BOOLEAN, operation, left, tmp);
+                        return new Expression(null, operation, left, tmp);
                     }
                 }
                 case LOWER_THAN -> {
@@ -202,58 +208,14 @@ public class Parser {
                     ))) {
                         var tmp = currentToken;
                         nextToken();
-                        return new Expression(Type.BOOLEAN, operation, left, tmp);
+                        return new Expression(null, operation, left, tmp);
                     }
                 }
             }
         }
-        else if (currentToken.type() == TokenType.INTEGER_LITERAL) {
-            left = currentToken;
-            nextToken();
 
-            switch (currentToken.type()) {
-                case SEMICOLON -> {
-                    return new Expression(Type.INTEGER, left);
-                }
-                case PLUS, MINUS, MULTI -> {
-                    Token operation = currentToken;
-                    nextToken();
-
-                    if (errorHandler.expectTokens(currentToken, Arrays.asList(
-                            TokenType.INTEGER_LITERAL,
-                            TokenType.IDENTIFIER
-                    ))) {
-                        var tmp = currentToken;
-                        nextToken();
-                        return new Expression(Type.BOOLEAN, operation, left, tmp);
-                    }
-                }
-                case LOWER_THAN -> {
-                    Token operation = currentToken;
-                    nextToken();
-
-                    if (errorHandler.expectTokens(currentToken, Arrays.asList(
-                            TokenType.INTEGER_LITERAL,
-                            TokenType.IDENTIFIER
-                    ))) {
-                        var tmp = currentToken;
-                        nextToken();
-                        return new Expression(Type.BOOLEAN, operation, left, tmp);
-                    }
-                }
-            }
-        }
-        else if (currentToken.type() == TokenType.TRUE_LITERAL) {
-            var tmp = currentToken;
-            nextToken();
-            return new Expression(Type.BOOLEAN, tmp);
-        }
-        else if (currentToken.type() == TokenType.FALSE_LITERAL) {
-            var tmp = currentToken;
-            nextToken();
-            return new Expression(Type.BOOLEAN, tmp);
-        }
-
-        return null;
+        var tmp = currentToken;
+        nextToken();
+        return new Expression(tp, tmp);
     }
 }

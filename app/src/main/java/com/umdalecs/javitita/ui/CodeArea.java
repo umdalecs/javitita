@@ -6,10 +6,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Style;
@@ -19,9 +16,18 @@ import javax.swing.text.StyledDocument;
 
 public class CodeArea extends JPanel {
     private final JTextPane codeField;
+    private final JTextArea lineNumbers;
     public CodeArea() {
         super(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder("Programa:"));
+
+        var mainFont = new Font("Hack", Font.PLAIN,28);
+        lineNumbers = new JTextArea("1");
+        lineNumbers.setBackground(new Color(230, 230, 230));
+        lineNumbers.setForeground(Color.GRAY);
+        lineNumbers.setEditable(false);
+        lineNumbers.setFont(mainFont);
+        lineNumbers.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
         codeField = new JTextPane();
         codeField.setText("""
@@ -35,9 +41,42 @@ public class CodeArea extends JPanel {
                 }
                 """);
 
-        codeField.setFont(new Font("Hack", Font.PLAIN,42));
+        codeField.setFont(mainFont);
+
+        codeField.getDocument().addDocumentListener(new DocumentListener() {
+            private void updateLineNumbers() {
+                // Obtenemos la cantidad de líneas actuales en el JTextPane
+                int lines = codeField.getDocument().getDefaultRootElement().getElementCount();
+                StringBuilder sb = new StringBuilder();
+                for (int i = 1; i <= lines; i++) {
+                    sb.append(i).append("\n");
+                }
+                lineNumbers.setText(sb.toString());
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) { updateLineNumbers(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { updateLineNumbers(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { updateLineNumbers(); }
+        });
+
+        updateInitialLineNumbers();
+
         var scrollPane = new JScrollPane(codeField);
+        scrollPane.setRowHeaderView(lineNumbers);
+
         add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private void updateInitialLineNumbers() {
+        int lines = codeField.getDocument().getDefaultRootElement().getElementCount();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= lines; i++) {
+            sb.append(i).append("\n");
+        }
+        lineNumbers.setText(sb.toString());
     }
 
     public String getText() {

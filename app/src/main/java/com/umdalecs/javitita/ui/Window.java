@@ -1,16 +1,17 @@
 package com.umdalecs.javitita.ui;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.swing.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umdalecs.javitita.compiler.ErrorHandler;
+import com.umdalecs.javitita.compiler.SymbolTable;
 import com.umdalecs.javitita.compiler.lexer.Lexer;
 import com.umdalecs.javitita.compiler.parser.ParseError;
 import com.umdalecs.javitita.compiler.parser.Parser;
 import com.umdalecs.javitita.compiler.lexer.Token;
 import com.umdalecs.javitita.compiler.lexer.TokenType;
+import com.umdalecs.javitita.compiler.semantic.Semantic;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -35,13 +36,17 @@ public class Window extends JFrame implements ComponentListener {
         setLayout(null);
 
         add(codeArea = new CodeArea());
-        add(lexerButton = new JButton("Análisis léxico"));
         add(lexemArea = new LexemArea());
         add(errorArea = new ErrorArea());
-        add(parserButton = new JButton("Análisis sintáctico"));
-        add(semButton = new JButton("Análisis semántico"));
-        add(interButton = new JButton("Código intermedio"));
         add(intermediateCodeArea = new IntermediateCodeArea());
+
+        add(lexerButton = new JButton("Análisis léxico"));
+        add(parserButton = new JButton("Análisis sintáctico"));
+        parserButton.setEnabled(false);
+        add(semButton = new JButton("Análisis semántico"));
+        semButton.setEnabled(false);
+        add(interButton = new JButton("Código intermedio"));
+        interButton.setEnabled(false);
 
         JMenuBar menuBar = new JMenuBar();
 
@@ -66,7 +71,8 @@ public class Window extends JFrame implements ComponentListener {
                 try {
                     var fileContent = Files.readString(archive.toPath());
                     codeArea.setText(fileContent);
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
             }
         });
 
@@ -81,7 +87,8 @@ public class Window extends JFrame implements ComponentListener {
                     FileWriter writer = new FileWriter(archive);
                     writer.write(codeArea.getText());
                     writer.close();
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
             }
         });
 
@@ -138,16 +145,50 @@ public class Window extends JFrame implements ComponentListener {
                 json = mapper
                         .writerWithDefaultPrettyPrinter()
                         .writeValueAsString(ast);
-            } catch (JsonProcessingException ignored) {}
+            } catch (JsonProcessingException ignored) {
+            }
 
             System.out.println(json);
         });
         semButton.addActionListener(e -> {
+            var errorHandler = new ErrorHandler();
+            var lexer = new Lexer(codeArea.getText(), errorHandler);
+            var parser = new Parser(lexer, errorHandler);
 
+            var ast = parser.parse();
+
+            var symbolTable = new SymbolTable();
+
+            var sem = new Semantic(ast, errorHandler, symbolTable);
+
+            sem.CheckSemantics();
+
+            SwingUtilities.invokeLater(() -> {
+                interButton.setEnabled(errorHandler.getErrors().isEmpty());
+
+                updateErrors(errorHandler);
+            });
+
+            ObjectMapper mapper = new ObjectMapper();
+            String json = null;
+            try {
+                json = mapper
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(ast);
+            } catch (JsonProcessingException ignored) {
+            }
+
+            System.out.println(json);
         });
+
         interButton.addActionListener(e -> {
 
         });
+
+        // 1. Establece un tamaño base al que la ventana regresará cuando la muevas
+        setSize(1024, 768);
+        // 2. Establece un límite para que el usuario no pueda hacerla demasiado pequeña
+        setMinimumSize(new java.awt.Dimension(1280, 720));
 
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -190,13 +231,13 @@ public class Window extends JFrame implements ComponentListener {
         errorArea.setBounds(x, y, w, h);
 
         x = 10;
-        y = (int) (getWidth() * .5) + 10;
+        y = (int) (getHeight() * .5) + 10;
         w = (int) (getWidth() * .4);
-        h = (int) (getWidth() * .05);
+        h = (int) (getHeight() * .05);
         interButton.setBounds(x, y, w, h);
 
-        y = y + h + 10;
-        h = (int) (getWidth() * .5) - 20 - h;
+        y = y + h;
+        h = (int) (getHeight() * .5) - 60 - h;
         intermediateCodeArea.setBounds(x, y, w, h);
 
         validate();
@@ -225,6 +266,6 @@ public class Window extends JFrame implements ComponentListener {
             }
 
             errorArea.setText(sb.toString());
-        } else errorArea.setText("No se encontraron errores");
+        } else errorArea.setText("No se detectaron errores");
     }
 }

@@ -1,12 +1,26 @@
 package com.umdalecs.javitita.compiler;
 
-import com.umdalecs.javitita.compiler.lexer.Token;
-import com.umdalecs.javitita.compiler.parser.Type;
-
 import java.util.HashMap;
+import java.util.Map;
 
 public class SymbolTable {
-    private HashMap<String, Symbol> symbols;
+    private final Map<String, Symbol> symbols;
+    public SymbolTable() {
+        symbols = new HashMap<>();
+    }
 
-    public SymbolTable(Token identifier, Type type) {}
+    /**
+     * @return {@code true} if it adds the entry,
+     * {@code false} if the entry actually exists
+     */
+    public boolean addSymbol(String name, Symbol entry) {
+        if (symbols.containsKey(name)) return false;
+        symbols.put(name, entry);
+        return true;
+    }
+
+    public Symbol getSymbol(String key) {
+        return symbols.get(key);
+    }
+
 }

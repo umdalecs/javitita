@@ -5,8 +5,8 @@ import com.umdalecs.javitita.compiler.parser.Type;
 import com.umdalecs.javitita.compiler.parser.syntaxtree.Statement;
 
 public class VarDeclarationStatement extends Statement {
-    private Type type;
-    private Token identifier;
+    private final Type type;
+    private final Token identifier;
 
     public VarDeclarationStatement(Token identifier, Type type) {
         this.identifier = identifier;
