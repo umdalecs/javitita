@@ -21,7 +21,7 @@ public class CodeArea extends JPanel {
         super(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder("Programa:"));
 
-        var mainFont = new Font("Hack", Font.PLAIN,28);
+        var mainFont = new Font("Hack", Font.PLAIN, 28);
         lineNumbers = new JTextArea("1");
         lineNumbers.setBackground(new Color(230, 230, 230));
         lineNumbers.setForeground(Color.GRAY);
@@ -35,7 +35,12 @@ public class CodeArea extends JPanel {
                   int x;
                   x = 5;
                   while (x<10) {
-                    println(x);
+                    int y;
+                    y = x;
+                    while(y<10) {
+                        println(y);
+                        y = y + 1;
+                    }
                     x = x + 1;
                   }
                 }
@@ -45,8 +50,8 @@ public class CodeArea extends JPanel {
 
         codeField.getDocument().addDocumentListener(new DocumentListener() {
             private void updateLineNumbers() {
-                // Obtenemos la cantidad de líneas actuales en el JTextPane
                 int lines = codeField.getDocument().getDefaultRootElement().getElementCount();
+
                 StringBuilder sb = new StringBuilder();
                 for (int i = 1; i <= lines; i++) {
                     sb.append(i).append("\n");
@@ -55,11 +60,19 @@ public class CodeArea extends JPanel {
             }
 
             @Override
-            public void insertUpdate(DocumentEvent e) { updateLineNumbers(); }
+            public void insertUpdate(DocumentEvent e) {
+                updateLineNumbers();
+            }
+
             @Override
-            public void removeUpdate(DocumentEvent e) { updateLineNumbers(); }
+            public void removeUpdate(DocumentEvent e) {
+                updateLineNumbers();
+            }
+
             @Override
-            public void changedUpdate(DocumentEvent e) { updateLineNumbers(); }
+            public void changedUpdate(DocumentEvent e) {
+                updateLineNumbers();
+            }
         });
 
         updateInitialLineNumbers();
@@ -86,14 +99,6 @@ public class CodeArea extends JPanel {
     public void setText(String text) {
         codeField.setText(text);
     }
-
-//    public void resetStyles() {
-//        StyledDocument doc = codeField.getStyledDocument();
-//        Style defaultStyle = StyleContext.getDefaultStyleContext()
-//                .getStyle(StyleContext.DEFAULT_STYLE);
-//
-//        doc.setCharacterAttributes(0, doc.getLength(), defaultStyle, false);
-//    }
 
     public void markError(Token token) {
         StyledDocument doc = codeField.getStyledDocument();

@@ -1,6 +1,5 @@
 package com.umdalecs.javitita.compiler.parser.statements;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.umdalecs.javitita.compiler.parser.syntaxtree.Expression;
 import com.umdalecs.javitita.compiler.parser.syntaxtree.Statement;
 

@@ -2,8 +2,6 @@ package com.umdalecs.javitita.ui;
 
 import javax.swing.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.umdalecs.javitita.compiler.ErrorHandler;
 import com.umdalecs.javitita.compiler.SymbolTable;
 import com.umdalecs.javitita.compiler.lexer.Lexer;
@@ -112,12 +110,15 @@ public class Window extends JFrame {
                     switch (t.type()) {
                         case ILLEGAL -> codeArea.markError(t);
                         case WHILE, BOOLEAN_TYPE, INTEGER_TYPE,
-                             TRUE_LITERAL, FALSE_LITERAL, FN,
-                             PRINT_STATEMENT -> codeArea.markKeyword(t);
+                                TRUE_LITERAL, FALSE_LITERAL, FN,
+                                PRINT_STATEMENT ->
+                            codeArea.markKeyword(t);
                         case INTEGER_LITERAL -> codeArea.markInteger(t);
                         case IDENTIFIER -> codeArea.markIdent(t);
+                        default -> {
+                        }
                     }
-                    Object[] row = {t.literal(), t.type().tokenName()};
+                    Object[] row = { t.literal(), t.type().tokenName() };
                     lexemArea.addRow(row);
                 }
 
@@ -138,18 +139,6 @@ public class Window extends JFrame {
 
                 updateErrors(errorHandler);
             });
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            String json = null;
-            try {
-                json = mapper
-                        .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(ast);
-            } catch (JsonProcessingException ignored) {
-            }
-
-            System.out.println(json);
         });
         semButton.addActionListener(e -> {
             var errorHandler = new ErrorHandler();
@@ -169,17 +158,6 @@ public class Window extends JFrame {
 
                 updateErrors(errorHandler);
             });
-
-            ObjectMapper mapper = new ObjectMapper();
-            String json = null;
-            try {
-                json = mapper
-                        .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(ast);
-            } catch (JsonProcessingException ignored) {
-            }
-
-            System.out.println(json);
         });
 
         interButton.addActionListener(e -> {
@@ -287,6 +265,7 @@ public class Window extends JFrame {
             }
 
             errorArea.setText(sb.toString());
-        } else errorArea.setText("No se detectaron errores");
+        } else
+            errorArea.setText("No se detectaron errores");
     }
 }
