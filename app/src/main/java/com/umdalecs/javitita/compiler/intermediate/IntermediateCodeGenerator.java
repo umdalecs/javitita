@@ -23,18 +23,18 @@ public class IntermediateCodeGenerator {
         contadorEtiqueta = 0;
     }
 
-
     public String generate() {
-        builder.append(String.format("%-10s %-14s %s\n", "","TITLE", "TEST1"));
-        builder.append(String.format("%-10s %-14s %s\n", "",".model", "SMALL"));
-        builder.append(String.format("%-10s %-14s %s\n", "",".stack", "100h"));
+        builder.append("title      TEST1\n");
+        builder.append("           .model     SMALL\n");
+        builder.append("           .stack     100h\n");
 
+        builder.append("           .data\n");
         generateSymbolTable();
 
-        builder.append(String.format("%-10s %s\n", "", ".code"));
+        builder.append("           .code\n");
         builder.append("main:\n");
 
-        for (var statement: program.getStatements()) {
+        for (var statement : program.getStatements()) {
             generateStatement(statement);
         }
 
@@ -42,21 +42,23 @@ public class IntermediateCodeGenerator {
                            MOV            AX, 4C00H
                            INT            21H
                 """);
-        builder.append("end main\n");
+        builder.append("end main");
 
         return builder.toString();
     }
 
     public void generateSymbolTable() {
-        builder.append(String.format("%-10s %s\n", "", ".data"));
 
-        for (var symbol: symbolTable.getValues()) {
-            var size = "dw";
+        for (var symbol : symbolTable.getValues()) {
+            var size = switch (symbol.type()) {
+                case Type.BOOLEAN -> "db";
+                case Type.INTEGER -> "dw";
+            };
 
             builder.append(String.format("%-10s %-14s %s\n",
                     symbol.token().literal(),
                     size,
-                    "?"));
+                    "0"));
         }
     }
 
@@ -76,7 +78,7 @@ public class IntermediateCodeGenerator {
                                    JE             %s
                         """, result, e2));
 
-                for (var statement: ws.getStatements()) {
+                for (var statement : ws.getStatements()) {
                     generateStatement(statement);
                 }
 
@@ -112,10 +114,10 @@ public class IntermediateCodeGenerator {
                                    MOV            AH, 02h
                                    MOV            DL, 13     ; CR
                                    INT            21h
-                        
+
                                    MOV            AH, 02h
                                    MOV            DL, 10     ; LF
-                                   INT            21h
+                                   INT            21H
                         """;
                 builder.append(String.format(format,
                         result,
@@ -126,30 +128,34 @@ public class IntermediateCodeGenerator {
 
                 var symbol = symbolTable.getSymbol(vas.getIdentifier().literal());
 
-                String format = "           MOV            %s, %s\n";
+                String format = switch (symbol.type()) {
+                    case Type.BOOLEAN -> "           MOV            %s, %s\n";
+                    case Type.INTEGER -> "           MOV            %s, %s\n";
+
+                };
+
                 builder.append(String.format(format,
-                        "word ptr [" + symbol.token().literal() + "]",
+                        symbol.token().literal(),
                         result));
             }
-            default -> {}
+            default -> {
+            }
         }
     }
 
-
-
     private String checkExpressionResult(Expression expression) {
-        if (expression.getType() == Type.BOOLEAN){
+        if (expression.getType() == Type.BOOLEAN) {
             if (expression.getLeft().literal().equals("true"))
                 return "1";
             else if (expression.getLeft().literal().equals("false"))
                 return "0";
             else {
-                var left =  expression.getLeft().type() == TokenType.IDENTIFIER
-                        ? "WORD PTR [" + expression.getLeft().literal() + "]"
+                var left = expression.getLeft().type() == TokenType.IDENTIFIER
+                        ? "[" + expression.getLeft().literal() + "]"
                         : expression.getLeft().literal();
 
-                var right =  expression.getRight().type() == TokenType.IDENTIFIER
-                        ? "WORD PTR [" + expression.getRight().literal() + "]"
+                var right = expression.getRight().type() == TokenType.IDENTIFIER
+                        ? "[" + expression.getRight().literal() + "]"
                         : expression.getRight().literal();
 
                 String e1 = "E" + contadorEtiqueta++;
@@ -171,46 +177,47 @@ public class IntermediateCodeGenerator {
                 return "AX";
             }
         } else {
-            if (expression.getOperation() == null){
-                if (expression.getLeft().type() == TokenType.IDENTIFIER){
-                    return "WORD PTR [" + expression.getLeft().literal() + "]";
+            if (expression.getOperation() == null) {
+                if (expression.getLeft().type() == TokenType.IDENTIFIER) {
+                    builder.append(
+                            String.format("           MOV            AX, %s\n",
+                                    expression.getLeft().literal()));
+                    return "AX";
                 } else {
                     return expression.getLeft().literal();
                 }
-            }else {
-                var left =  expression.getLeft().type() == TokenType.IDENTIFIER
-                        ? "WORD PTR [" + expression.getLeft().literal() + "]"
-                        : expression.getLeft().literal();
+            } else {
+                var left = expression.getLeft().literal();
 
-                var right =  expression.getRight().type() == TokenType.IDENTIFIER
-                        ? "WORD PTR [" + expression.getRight().literal() + "]"
-                        : expression.getRight().literal();
+                var right = expression.getRight().literal();
 
                 switch (expression.getOperation().type()) {
                     case PLUS: {
                         builder.append(String.format("""
-                                       MOV            AX, %s
-                                       MOV            BX, %s
-                                       ADD            AX, BX
-                            """, left, right));
+                                           MOV            AX, %s
+                                           MOV            BX, %s
+                                           ADD            AX, BX
+                                """, left, right));
                     }
-                    break;
+                        break;
                     case MINUS: {
                         builder.append(String.format("""
-                                       MOV            AX, %s
-                                       MOV            BX, %s
-                                       SUB            AX, BX
-                            """, left, right));
+                                           MOV            AX, %s
+                                           MOV            BX, %s
+                                           SUB            AX, BX
+                                """, left, right));
                     }
-                    break;
+                        break;
                     case MULTI: {
                         builder.append(String.format("""
-                                       MOV            AX, %s
-                                       MOV            BX, %s
-                                       MUL            AX, BX
-                            """, left, right));
+                                           MOV            AX, %s
+                                           MOV            BX, %s
+                                           MUL            AX, BX
+                                """, left, right));
                     }
-                    break;
+                        break;
+                    default:
+                        break;
                 }
                 return "AX";
             }
