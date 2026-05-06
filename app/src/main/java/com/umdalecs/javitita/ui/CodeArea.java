@@ -1,17 +1,21 @@
 package com.umdalecs.javitita.ui;
 
-import com.umdalecs.javitita.compiler.Token;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+
+import com.umdalecs.javitita.compiler.Token;
 
 public class CodeArea extends JPanel {
     private final JTextPane codeField;
@@ -21,7 +25,7 @@ public class CodeArea extends JPanel {
         super(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder("Programa:"));
 
-        var mainFont = new Font("Hack", Font.PLAIN, 20);
+        var mainFont = new Font("Hack", Font.PLAIN, 24);
         lineNumbers = new JTextArea("1");
         lineNumbers.setBackground(new Color(230, 230, 230));
         lineNumbers.setForeground(Color.GRAY);

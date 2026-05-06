@@ -1,9 +1,5 @@
 package com.umdalecs.javitita.ui;
 
-import javax.swing.*;
-
-import com.umdalecs.javitita.compiler.*;
-
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.File;
@@ -11,6 +7,25 @@ import java.io.FileWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+
+import com.umdalecs.javitita.compiler.ErrorHandler;
+import com.umdalecs.javitita.compiler.IntermediateCodeGenerator;
+import com.umdalecs.javitita.compiler.Lexer;
+import com.umdalecs.javitita.compiler.ObjectCodeGenerator;
+import com.umdalecs.javitita.compiler.ParseError;
+import com.umdalecs.javitita.compiler.Parser;
+import com.umdalecs.javitita.compiler.Semantic;
+import com.umdalecs.javitita.compiler.SymbolTable;
+import com.umdalecs.javitita.compiler.Token;
+import com.umdalecs.javitita.compiler.TokenType;
 
 public class Window extends JFrame {
     private final CodeArea codeArea;
@@ -237,7 +252,7 @@ public class Window extends JFrame {
 
                 x = 10;
                 y = (int) (getHeight() * .5) + 10;
-                w = (int) (getWidth() * .4);
+                w = (int) (getWidth() * .5);
                 h = (int) (getHeight() * .05);
                 interButton.setBounds(x, y, w, h);
 
@@ -247,7 +262,7 @@ public class Window extends JFrame {
 
                 x = x + w;
                 y = (int) (getHeight() * .5) + 10;
-                w = (int) (getWidth() * .6) - 30;
+                w = (int) (getWidth() * .5) - 30;
                 h = (int) (getHeight() * .05);
                 objButton.setBounds(x, y, w, h);
 

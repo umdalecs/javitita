@@ -3,20 +3,20 @@ package com.umdalecs.javitita.compiler;
 public class IntermediateCodeGenerator {
     private final SymbolTable symbolTable;
     private final Program program;
-    private final StringBuilder builder;
+    private StringBuilder builder;
     private int contadorEtiqueta;
 
     public IntermediateCodeGenerator(SymbolTable symbolTable, Program program) {
         this.symbolTable = symbolTable;
         this.program = program;
-        builder = new StringBuilder();
         contadorEtiqueta = 0;
     }
-
+    
     public String generate() {
+        builder = new StringBuilder();
         builder.append("title      TEST1\n");
         builder.append("           .model        SMALL\n");
-        builder.append("           .stack        100h\n");
+        builder.append("           .stack        100H\n");
 
         builder.append("           .data\n");
         generateSymbolTable();

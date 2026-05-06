@@ -15,7 +15,7 @@ public class ErrorArea extends JPanel {
         textField = new JTextPane();
         textField.setEditable(false);
 
-        textField.setFont(new Font("Hack", Font.PLAIN,20));
+        textField.setFont(new Font("Hack", Font.PLAIN,24));
         var scrollPane = new JScrollPane(textField);
         add(scrollPane, BorderLayout.CENTER);
     }

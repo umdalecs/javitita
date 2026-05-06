@@ -6,53 +6,61 @@ import java.util.Scanner;
 
 public class ObjectCodeGenerator {
     private final Map<String, IntermediateSymbol> symbols;
-    private final Scanner scanner;
+    private final String input;
 
     public ObjectCodeGenerator(String input) {
-        this.scanner = new Scanner(input);
+        this.input = input;
         this.symbols = new HashMap<>();
     }
 
     public String generate() throws Exception {
         var output = new StringBuilder();
-        scanner.nextLine(); // TITLE
-        scanner.nextLine(); // MODEL
-        scanner.nextLine(); // STACK
-        scanner.nextLine(); // .data
 
+        try (Scanner scanner = new Scanner(input)) {
+            scanner.nextLine(); // TITLE
+            scanner.nextLine(); // MODEL
+            scanner.nextLine(); // STACK
+            scanner.nextLine(); // .data
+
+            generateData(output, scanner);
+        }
+
+        return output.toString();
+    }
+
+    public void generateData(StringBuilder output, Scanner scanner) throws Exception {
         var offset = 0;
 
         String line;
         while (!((line = scanner.nextLine()).trim().equals(".code"))) {
+            try (var sc2 = new Scanner(line)) {
+                var name = sc2.next();
 
-            var sc2 = new Scanner(line);
+                var size = switch (sc2.next()) {
+                    case "dw" -> 16;
+                    case "db" -> 8;
+                    default -> {
+                        throw new Exception("Invalid size");
+                    }
+                };
 
-            var name = sc2.next();
+                var value = sc2.next();
+                var valueI = Integer.parseInt(value);
 
-            var size = switch (sc2.next()) {
-                case "dw" -> 16;
-                case "db" -> 8;
-                default -> throw new Exception("Invalid size");
-            };
+                var offsetB = String.format("%16s", Integer.toBinaryString(offset)).replace(' ', '0');
+                output.append(offsetB);
 
-            var value = sc2.next();
-            var valueI = Integer.parseInt(value);
+                output.append(' ');
 
-            var offsetB = String.format("%16s", Integer.toBinaryString(offset)).replace(' ', '0');
-            output.append(offsetB);
+                var valueB = String.format("%" + size + "s", Integer.toBinaryString(valueI)).replace(' ', '0');
+                output.append(valueB);
 
-            output.append(' ');
+                symbols.put(name, new IntermediateSymbol(name, offsetB, valueB));
 
-            var valueB = String.format("%" + size + "s", Integer.toBinaryString(valueI)).replace(' ', '0');
-            output.append(valueB);
+                offset += (size / 8);
 
-            symbols.put(name, new IntermediateSymbol(name, offsetB, valueB));
-
-            offset += (size / 8);
-
-            output.append('\n');
+                output.append('\n');
+            }
         }
-
-        return output.toString();
     }
 }
