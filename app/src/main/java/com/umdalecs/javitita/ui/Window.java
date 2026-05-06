@@ -2,15 +2,7 @@ package com.umdalecs.javitita.ui;
 
 import javax.swing.*;
 
-import com.umdalecs.javitita.compiler.ErrorHandler;
-import com.umdalecs.javitita.compiler.SymbolTable;
-import com.umdalecs.javitita.compiler.lexer.Lexer;
-import com.umdalecs.javitita.compiler.parser.ParseError;
-import com.umdalecs.javitita.compiler.parser.Parser;
-import com.umdalecs.javitita.compiler.lexer.Token;
-import com.umdalecs.javitita.compiler.lexer.TokenType;
-import com.umdalecs.javitita.compiler.semantic.Semantic;
-import com.umdalecs.javitita.compiler.intermediate.IntermediateCodeGenerator;
+import com.umdalecs.javitita.compiler.*;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -22,10 +14,11 @@ import java.util.List;
 
 public class Window extends JFrame {
     private final CodeArea codeArea;
-    private final JButton lexerButton, parserButton, semButton, interButton;
+    private final JButton lexerButton, parserButton, semButton, interButton, objButton;
     private final LexemArea lexemArea;
     private final ErrorArea errorArea;
     private final IntermediateCodeArea intermediateCodeArea;
+    private final ObjectCodeArea objectCodeArea;
 
     private List<Token> tokens;
 
@@ -38,6 +31,7 @@ public class Window extends JFrame {
         add(lexemArea = new LexemArea());
         add(errorArea = new ErrorArea());
         add(intermediateCodeArea = new IntermediateCodeArea());
+        add(objectCodeArea = new ObjectCodeArea());
 
         add(lexerButton = new JButton("Análisis léxico"));
         add(parserButton = new JButton("Análisis sintáctico"));
@@ -46,6 +40,8 @@ public class Window extends JFrame {
         semButton.setEnabled(false);
         add(interButton = new JButton("Código intermedio"));
         interButton.setEnabled(false);
+        add(objButton = new JButton("Código Objeto"));
+        objButton.setEnabled(false);
 
         JMenuBar menuBar = new JMenuBar();
 
@@ -110,15 +106,14 @@ public class Window extends JFrame {
                     switch (t.type()) {
                         case ILLEGAL -> codeArea.markError(t);
                         case WHILE, BOOLEAN_TYPE, INTEGER_TYPE,
-                                TRUE_LITERAL, FALSE_LITERAL, FN,
-                                PRINT_STATEMENT ->
-                            codeArea.markKeyword(t);
+                             TRUE_LITERAL, FALSE_LITERAL, FN,
+                             PRINT_STATEMENT -> codeArea.markKeyword(t);
                         case INTEGER_LITERAL -> codeArea.markInteger(t);
                         case IDENTIFIER -> codeArea.markIdent(t);
                         default -> {
                         }
                     }
-                    Object[] row = { t.literal(), t.type().tokenName() };
+                    Object[] row = {t.literal(), t.type().tokenName()};
                     lexemArea.addRow(row);
                 }
 
@@ -179,10 +174,23 @@ public class Window extends JFrame {
 
             SwingUtilities.invokeLater(() -> {
                 // Here will be the object code button
-                // interButton.setEnabled(errorHandler.getErrors().isEmpty());
+                objButton.setEnabled(errorHandler.getErrors().isEmpty());
+
                 intermediateCodeArea.setText(intermediateCode);
 
                 updateErrors(errorHandler);
+            });
+        });
+
+        objButton.addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    var objectCode = new ObjectCodeGenerator(intermediateCodeArea.getText()).generate();
+
+                    objectCodeArea.setText(objectCode);
+                } catch (Exception ex) {
+                    errorArea.setText("Invalid intermediate code: " + ex.getMessage());
+                }
             });
         });
 
@@ -209,7 +217,7 @@ public class Window extends JFrame {
                 lexerButton.setBounds(x, y, w, h);
 
                 x = x + w;
-                w = getWidth() - (int) (getWidth() * .7) - 20;
+                w = getWidth() - (int) (getWidth() * .7) - 30;
                 parserButton.setBounds(x, y, w, h);
 
                 y = y + h;
@@ -223,7 +231,7 @@ public class Window extends JFrame {
 
                 x = (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20);
                 y = y + (int) (getHeight() * .05);
-                w = getWidth() - (int) (getWidth() * .7) - 20;
+                w = getWidth() - (int) (getWidth() * .7) - 30;
                 h = h - (int) (getHeight() * .05);
                 errorArea.setBounds(x, y, w, h);
 
@@ -236,6 +244,16 @@ public class Window extends JFrame {
                 y = y + h;
                 h = (int) (getHeight() * .5) - 60 - h;
                 intermediateCodeArea.setBounds(x, y, w, h);
+
+                x = x + w;
+                y = (int) (getHeight() * .5) + 10;
+                w = (int) (getWidth() * .6) - 30;
+                h = (int) (getHeight() * .05);
+                objButton.setBounds(x, y, w, h);
+
+                y = y + h;
+                h = (int) (getHeight() * .5) - 60 - h;
+                objectCodeArea.setBounds(x, y, w, h);
 
                 validate();
             }

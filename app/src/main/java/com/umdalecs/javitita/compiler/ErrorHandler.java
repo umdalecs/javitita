@@ -1,11 +1,5 @@
 package com.umdalecs.javitita.compiler;
 
-import com.umdalecs.javitita.compiler.lexer.LexicalError;
-import com.umdalecs.javitita.compiler.lexer.Token;
-import com.umdalecs.javitita.compiler.lexer.TokenType;
-import com.umdalecs.javitita.compiler.parser.ParseError;
-import com.umdalecs.javitita.compiler.semantic.SemanticError;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +27,7 @@ public class ErrorHandler {
 
         return result;
     }
+
     public boolean expectTokens(Token token, List<TokenType> expectedTokens) {
         boolean flag = false;
         StringBuilder expectedTokenName = new StringBuilder();

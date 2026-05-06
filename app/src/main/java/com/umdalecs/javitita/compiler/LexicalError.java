@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.compiler.lexer;
+package com.umdalecs.javitita.compiler;
 
 public class LexicalError extends RuntimeException {
     public LexicalError(Token token) {

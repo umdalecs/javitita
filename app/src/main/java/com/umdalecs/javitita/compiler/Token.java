@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.compiler.lexer;
+package com.umdalecs.javitita.compiler;
 
 import java.util.Map;
 

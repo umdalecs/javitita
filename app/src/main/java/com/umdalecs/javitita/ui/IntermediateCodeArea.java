@@ -3,15 +3,16 @@ package com.umdalecs.javitita.ui;
 import javax.swing.*;
 import java.awt.*;
 
-public class IntermediateCodeArea  extends JPanel {
+public class IntermediateCodeArea extends JPanel {
     private final JTextPane textField;
+
     public IntermediateCodeArea() {
         super(new BorderLayout());
 
         textField = new JTextPane();
         textField.setEditable(false);
 
-        textField.setFont(new Font("Hack", Font.PLAIN,28));
+        textField.setFont(new Font("Hack", Font.PLAIN, 20));
         var scrollPane = new JScrollPane(textField);
         add(scrollPane, BorderLayout.CENTER);
     }
@@ -20,4 +21,7 @@ public class IntermediateCodeArea  extends JPanel {
         textField.setText(text);
     }
 
+    public String getText() {
+        return textField.getText();
+    }
 }

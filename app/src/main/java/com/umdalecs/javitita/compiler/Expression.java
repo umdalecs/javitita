@@ -1,7 +1,4 @@
-package com.umdalecs.javitita.compiler.parser.syntaxtree;
-
-import com.umdalecs.javitita.compiler.lexer.Token;
-import com.umdalecs.javitita.compiler.parser.Type;
+package com.umdalecs.javitita.compiler;
 
 public class Expression {
     private Type type;
@@ -17,7 +14,7 @@ public class Expression {
     public Expression(Type type, Token left) {
         this.type = type;
         this.left = left;
-        operation=right=null;
+        operation = right = null;
     }
 
     public Type getType() {

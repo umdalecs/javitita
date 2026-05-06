@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.compiler.parser.syntaxtree;
+package com.umdalecs.javitita.compiler;
 
 import java.util.ArrayList;
 import java.util.List;

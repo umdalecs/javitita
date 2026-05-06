@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.compiler.semantic;
+package com.umdalecs.javitita.compiler;
 
 public class SemanticError extends RuntimeException {
     public SemanticError(String message) {

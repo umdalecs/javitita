@@ -1,6 +1,4 @@
-package com.umdalecs.javitita.compiler.lexer;
-
-import com.umdalecs.javitita.compiler.ErrorHandler;
+package com.umdalecs.javitita.compiler;
 
 public class Lexer {
     private final String input;
@@ -36,7 +34,7 @@ public class Lexer {
 
     private void skipWhitespaces() {
         while (" \n\t".indexOf(currentChar) != -1) {
-            if (currentChar == '\n'){
+            if (currentChar == '\n') {
                 line++;
                 column = 0;
             }

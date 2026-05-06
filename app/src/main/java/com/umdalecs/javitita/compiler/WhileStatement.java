@@ -1,7 +1,4 @@
-package com.umdalecs.javitita.compiler.parser.statements;
-
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Expression;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Statement;
+package com.umdalecs.javitita.compiler;
 
 import java.util.List;
 

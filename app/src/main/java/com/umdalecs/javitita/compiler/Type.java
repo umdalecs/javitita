@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.compiler.parser;
+package com.umdalecs.javitita.compiler;
 
 public enum Type {
     BOOLEAN,
