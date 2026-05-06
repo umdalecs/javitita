@@ -1,14 +1,4 @@
-package com.umdalecs.javitita.compiler.intermediate;
-
-import com.umdalecs.javitita.compiler.SymbolTable;
-import com.umdalecs.javitita.compiler.lexer.TokenType;
-import com.umdalecs.javitita.compiler.parser.Type;
-import com.umdalecs.javitita.compiler.parser.statements.PrintStatement;
-import com.umdalecs.javitita.compiler.parser.statements.VarAssignStatement;
-import com.umdalecs.javitita.compiler.parser.statements.WhileStatement;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Expression;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Program;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Statement;
+package com.umdalecs.javitita.compiler;
 
 public class IntermediateCodeGenerator {
     private final SymbolTable symbolTable;
@@ -25,8 +15,8 @@ public class IntermediateCodeGenerator {
 
     public String generate() {
         builder.append("title      TEST1\n");
-        builder.append("           .model     SMALL\n");
-        builder.append("           .stack     100h\n");
+        builder.append("           .model        SMALL\n");
+        builder.append("           .stack        100h\n");
 
         builder.append("           .data\n");
         generateSymbolTable();
@@ -114,7 +104,7 @@ public class IntermediateCodeGenerator {
                                    MOV            AH, 02h
                                    MOV            DL, 13     ; CR
                                    INT            21h
-
+                        
                                    MOV            AH, 02h
                                    MOV            DL, 10     ; LF
                                    INT            21H
@@ -199,7 +189,7 @@ public class IntermediateCodeGenerator {
                                            ADD            AX, BX
                                 """, left, right));
                     }
-                        break;
+                    break;
                     case MINUS: {
                         builder.append(String.format("""
                                            MOV            AX, %s
@@ -207,7 +197,7 @@ public class IntermediateCodeGenerator {
                                            SUB            AX, BX
                                 """, left, right));
                     }
-                        break;
+                    break;
                     case MULTI: {
                         builder.append(String.format("""
                                            MOV            AX, %s
@@ -215,7 +205,7 @@ public class IntermediateCodeGenerator {
                                            MUL            AX, BX
                                 """, left, right));
                     }
-                        break;
+                    break;
                     default:
                         break;
                 }

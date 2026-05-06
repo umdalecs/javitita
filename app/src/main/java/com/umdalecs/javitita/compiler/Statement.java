@@ -1,4 +1,4 @@
-package com.umdalecs.javitita.compiler.parser.syntaxtree;
+package com.umdalecs.javitita.compiler;
 
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

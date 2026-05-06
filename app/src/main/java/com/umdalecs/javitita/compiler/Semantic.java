@@ -1,18 +1,4 @@
-package com.umdalecs.javitita.compiler.semantic;
-
-import com.umdalecs.javitita.compiler.ErrorHandler;
-import com.umdalecs.javitita.compiler.Symbol;
-import com.umdalecs.javitita.compiler.SymbolTable;
-import com.umdalecs.javitita.compiler.lexer.Token;
-import com.umdalecs.javitita.compiler.lexer.TokenType;
-import com.umdalecs.javitita.compiler.parser.Type;
-import com.umdalecs.javitita.compiler.parser.statements.PrintStatement;
-import com.umdalecs.javitita.compiler.parser.statements.VarAssignStatement;
-import com.umdalecs.javitita.compiler.parser.statements.VarDeclarationStatement;
-import com.umdalecs.javitita.compiler.parser.statements.WhileStatement;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Expression;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Program;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Statement;
+package com.umdalecs.javitita.compiler;
 
 public class Semantic {
     private final Program program;
@@ -26,10 +12,11 @@ public class Semantic {
     }
 
     public void CheckSemantics() {
-        for (var statement: program.getStatements()) {
+        for (var statement : program.getStatements()) {
             checkStatementSemantic(statement);
         }
     }
+
     private void checkStatementSemantic(Statement statement) {
         switch (statement) {
             case WhileStatement ws -> {
@@ -37,11 +24,11 @@ public class Semantic {
 
                 if (checkExpressionType(condition) != Type.BOOLEAN)
                     errorHandler.addSemanticError(String.format(
-                                "el tipo devuelto por la expresión de una condición debe ser BOOLEAN en linea %d",
-                                condition.getLeft().line()
-                            ));
+                            "el tipo devuelto por la expresión de una condición debe ser BOOLEAN en linea %d",
+                            condition.getLeft().line()
+                    ));
 
-                for (var st: ws.getStatements()) {
+                for (var st : ws.getStatements()) {
                     checkStatementSemantic(st);
                 }
             }
@@ -83,13 +70,14 @@ public class Semantic {
                 if (!symbolTable.addSymbol(identifierToken.literal(), entry))
                     errorHandler.addSemanticError(
                             String.format(
-                                "intentando redeclarar identificador `%s` en %d:%d",
-                                identifierToken.literal(),
-                                identifierToken.line(),
-                                identifierToken.column()
+                                    "intentando redeclarar identificador `%s` en %d:%d",
+                                    identifierToken.literal(),
+                                    identifierToken.line(),
+                                    identifierToken.column()
                             ));
             }
-            default -> {}
+            default -> {
+            }
         }
     }
 
@@ -98,6 +86,7 @@ public class Semantic {
      * <p>
      * this method also side effect the expression
      * rewriting its type member
+     *
      * @param expression {@link Expression}
      * @return the {@link Type} of the expression.
      */
@@ -117,13 +106,15 @@ public class Semantic {
         // LEFT (IDENTIFIER(INTEGER) | INTEGER_LITERAL) < RIGHT (IDENTIFIER(INTEGER) | INTEGER_LITERAL) -> Type.BOOLEAN
         if (
                 !(expression.getLeft().type() == TokenType.INTEGER_LITERAL
-                || checkIdentifierType(expression.getLeft()) == Type.INTEGER)
-        ) errorHandler.addSemanticError(String.format("mezcla de tipos en operación en la linea %d", expression.getLeft().line()));
+                        || checkIdentifierType(expression.getLeft()) == Type.INTEGER)
+        )
+            errorHandler.addSemanticError(String.format("mezcla de tipos en operación en la linea %d", expression.getLeft().line()));
 
         if (
                 !(expression.getRight().type() == TokenType.INTEGER_LITERAL
                         || checkIdentifierType(expression.getRight()) == Type.INTEGER)
-        ) errorHandler.addSemanticError(String.format("mezcla de tipos en operación en la linea %d", expression.getRight().line()));
+        )
+            errorHandler.addSemanticError(String.format("mezcla de tipos en operación en la linea %d", expression.getRight().line()));
 
         return switch (expression.getOperation().type()) {
             case MINUS, MULTI, PLUS -> {

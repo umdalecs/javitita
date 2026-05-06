@@ -1,8 +1,4 @@
-package com.umdalecs.javitita.compiler.parser.statements;
-
-import com.umdalecs.javitita.compiler.lexer.Token;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Expression;
-import com.umdalecs.javitita.compiler.parser.syntaxtree.Statement;
+package com.umdalecs.javitita.compiler;
 
 public class VarAssignStatement extends Statement {
     private Token identifier;

@@ -1,6 +1,6 @@
 package com.umdalecs.javitita.ui;
 
-import com.umdalecs.javitita.compiler.lexer.Token;
+import com.umdalecs.javitita.compiler.Token;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -21,7 +21,7 @@ public class CodeArea extends JPanel {
         super(new BorderLayout());
         setBorder(BorderFactory.createTitledBorder("Programa:"));
 
-        var mainFont = new Font("Hack", Font.PLAIN, 28);
+        var mainFont = new Font("Hack", Font.PLAIN, 20);
         lineNumbers = new JTextArea("1");
         lineNumbers.setBackground(new Color(230, 230, 230));
         lineNumbers.setForeground(Color.GRAY);

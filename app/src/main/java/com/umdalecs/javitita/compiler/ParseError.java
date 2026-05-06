@@ -1,6 +1,6 @@
-package com.umdalecs.javitita.compiler.parser;
+package com.umdalecs.javitita.compiler;
 
-import com.umdalecs.javitita.compiler.lexer.Token;
+import com.umdalecs.javitita.compiler.Token;
 
 public class ParseError extends RuntimeException {
     private final Token token;
