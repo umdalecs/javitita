@@ -104,7 +104,6 @@ public class IntermediateCodeGenerator {
                                    MOV            AH, 02h
                                    MOV            DL, 13     ; CR
                                    INT            21h
-                        
                                    MOV            AH, 02h
                                    MOV            DL, 10     ; LF
                                    INT            21H
@@ -141,11 +140,11 @@ public class IntermediateCodeGenerator {
                 return "0";
             else {
                 var left = expression.getLeft().type() == TokenType.IDENTIFIER
-                        ? "[" + expression.getLeft().literal() + "]"
+                        ? expression.getLeft().literal()
                         : expression.getLeft().literal();
 
                 var right = expression.getRight().type() == TokenType.IDENTIFIER
-                        ? "[" + expression.getRight().literal() + "]"
+                        ? expression.getRight().literal()
                         : expression.getRight().literal();
 
                 String e1 = "E" + contadorEtiqueta++;
@@ -202,7 +201,7 @@ public class IntermediateCodeGenerator {
                         builder.append(String.format("""
                                            MOV            AX, %s
                                            MOV            BX, %s
-                                           MUL            AX, BX
+                                           MUL            BX
                                 """, left, right));
                     }
                     break;

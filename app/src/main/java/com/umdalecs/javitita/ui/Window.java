@@ -94,9 +94,9 @@ public class Window extends JFrame {
             if (result == JFileChooser.APPROVE_OPTION) {
                 File archive = fileChooser.getSelectedFile();
                 try {
-                    FileWriter writer = new FileWriter(archive);
-                    writer.write(codeArea.getText());
-                    writer.close();
+                    try (FileWriter writer = new FileWriter(archive)) {
+                        writer.write(codeArea.getText());
+                    }
                 } catch (Exception ignored) {
                 }
             }
@@ -241,7 +241,7 @@ public class Window extends JFrame {
                 x = (getWidth() / 2) + 10;
                 y = (int) (getHeight() * .05 + 25);
                 w = (int) (getWidth() * .20);
-                h = (int) ((getHeight() * .5) - ((getHeight() * .05) + 25));
+                h = (int) ((getHeight() * .5) - ((getHeight() * .05) + 15));
                 lexemArea.setBounds(x, y, w, h);
 
                 x = (int) (getWidth() * .5) + 10 + (int) (getWidth() * .20);
