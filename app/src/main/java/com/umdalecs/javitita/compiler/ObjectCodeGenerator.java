@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class ObjectCodeGenerator {
-
     private final Map<String, IntermediateSymbol> symbols;
     private final Map<String, Integer> labels;
     private final String input;
@@ -20,11 +19,9 @@ public class ObjectCodeGenerator {
     private List<JumpMetadata> jumps;
 
     private static record LineMetadata(StringBuilder output, String offset) {
-
     }
 
     private static record JumpMetadata(StringBuilder output, String label) {
-
     }
 
     public ObjectCodeGenerator(String input) {
@@ -60,10 +57,8 @@ public class ObjectCodeGenerator {
                 var name = sc2.next();
 
                 var size = switch (sc2.next()) {
-                    case "dw" ->
-                        16;
-                    case "db" ->
-                        8;
+                    case "dw" -> 16;
+                    case "db" -> 8;
                     default -> {
                         throw new Exception("Invalid size");
                     }
@@ -105,36 +100,24 @@ public class ObjectCodeGenerator {
         name = name.toUpperCase();
 
         return switch (name) {
-            case "AX", "AL" ->
-                "000";
-            case "CX", "CL" ->
-                "001";
-            case "DX", "DL" ->
-                "010";
-            case "BX", "BL" ->
-                "011";
-            case "SP", "AH" ->
-                "100";
-            case "BP", "CH" ->
-                "101";
-            case "SI", "DH" ->
-                "110";
-            case "DI", "BH" ->
-                "111";
-            default ->
-                throw new IllegalArgumentException("Invalid register: " + name);
+            case "AX", "AL" -> "000";
+            case "CX", "CL" -> "001";
+            case "DX", "DL" -> "010";
+            case "BX", "BL" -> "011";
+            case "SP", "AH" -> "100";
+            case "BP", "CH" -> "101";
+            case "SI", "DH" -> "110";
+            case "DI", "BH" -> "111";
+            default -> throw new IllegalArgumentException("Invalid register: " + name);
         };
     }
 
     private String wordValue(String name) {
         name = name.toUpperCase();
         return switch (name) {
-            case "AX", "BX", "CX", "DX", "SI", "DI", "SP", "BP" ->
-                "1";
-            case "AL", "BL", "CL", "DL", "AH", "BH", "CH", "DH" ->
-                "0";
-            default ->
-                throw new IllegalArgumentException("Invalid register: " + name);
+            case "AX", "BX", "CX", "DX", "SI", "DI", "SP", "BP" -> "1";
+            case "AL", "BL", "CL", "DL", "AH", "BH", "CH", "DH" -> "0";
+            default -> throw new IllegalArgumentException("Invalid register: " + name);
         };
     }
 
@@ -184,40 +167,23 @@ public class ObjectCodeGenerator {
                     var currentOffset = parseNumToBin(offset + "", 16);
 
                     var codeLine = switch (first) {
-                        case "MOV" ->
-                            generateMOV(operand1, operand2);
-                        case "CMP" ->
-                            generateCMP(operand1, operand2);
-                        case "XOR" ->
-                            generateXOR(operand1, operand2);
-                        case "DIV" ->
-                            generateDIV(operand1);
-                        case "INC" ->
-                            generateINC(operand1);
-                        case "ADD" ->
-                            generateADD(operand1, operand2);
-                        case "MUL" ->
-                            generateMUL(operand1);
-                        case "SUB" ->
-                            generateSUB(operand1, operand2);
-                        case "PUSH" ->
-                            generatePUSH(operand1);
-                        case "POP" ->
-                            generatePOP(operand1);
-                        case "INT" ->
-                            generateINT(operand1);
-                        case "JL" ->
-                            generateJL(operand1);
-                        case "JNE" ->
-                            generateJNE(operand1);
-                        case "JE" ->
-                            generateJE(operand1);
-                        case "JMP" ->
-                            generateJMP(operand1);
-                        case "LOOP" ->
-                            generateLOOP(operand1);
-                        default ->
-                            null;
+                        case "MOV" -> generateMOV(operand1, operand2);
+                        case "CMP" -> generateCMP(operand1, operand2);
+                        case "XOR" -> generateXOR(operand1, operand2);
+                        case "DIV" -> generateDIV(operand1);
+                        case "INC" -> generateINC(operand1);
+                        case "ADD" -> generateADD(operand1, operand2);
+                        case "MUL" -> generateMUL(operand1);
+                        case "SUB" -> generateSUB(operand1, operand2);
+                        case "PUSH" -> generatePUSH(operand1);
+                        case "POP" -> generatePOP(operand1);
+                        case "INT" -> generateINT(operand1);
+                        case "JL" -> generateJL(operand1);
+                        case "JNE" -> generateJNE(operand1);
+                        case "JE" -> generateJE(operand1);
+                        case "JMP" -> generateJMP(operand1);
+                        case "LOOP" -> generateLOOP(operand1);
+                        default -> null;
                     };
 
                     lines.add(new LineMetadata(codeLine, currentOffset));
@@ -225,9 +191,9 @@ public class ObjectCodeGenerator {
 
             }
         }
-        for (var j : jumps) {
+        for (var j : jumps)
             j.output.append(parseNumToBin(labels.get(j.label + ":").toString(), 16));
-        }
+
         for (var l : lines) {
             globalOutput.append(l.offset);
             globalOutput.append(" ");
@@ -294,11 +260,11 @@ public class ObjectCodeGenerator {
         var reg1 = getRegCode(op1);
         var reg2 = getRegCode(op2);
 
-        output.append("0000010");
-        output.append(wordValue(op1));
-        output.append("11");
-        output.append(reg2);
-        output.append(reg1);
+        output.append("0000010")
+                .append(wordValue(op1))
+                .append("11")
+                .append(reg2)
+                .append(reg1);
 
         offset += 4;
         return output;
@@ -309,10 +275,10 @@ public class ObjectCodeGenerator {
 
         var reg1 = getRegCode(op1);
 
-        output.append("1111011");
-        output.append(wordValue(op1));
-        output.append("11100");
-        output.append(reg1);
+        output.append("1111011")
+                .append(wordValue(op1))
+                .append("11100")
+                .append(reg1);
 
         offset += 4;
         offset += 4;
@@ -333,15 +299,15 @@ public class ObjectCodeGenerator {
         }
 
         if (isReg) {
-            output.append("0011100");
-            output.append(wordValue(op1));
-            output.append("11");
-            output.append(reg2);
+            output.append("0011100")
+                    .append(wordValue(op1))
+                    .append("11")
+                    .append(reg2);
             offset += 4;
         } else {
-            output.append("1000000");
-            output.append(wordValue(op1));
-            output.append("11111");
+            output.append("1000000")
+                    .append(wordValue(op1))
+                    .append("11111");
             offset += 6;
         }
         output.append(reg1);
@@ -355,19 +321,19 @@ public class ObjectCodeGenerator {
 
     private StringBuilder generateXOR(String op1, String op2) {
         var output = new StringBuilder();
-        output.append("0001100");
-        output.append(wordValue(op1));
-        output.append("11");
-        output.append(getRegCode(op2));
-        output.append(getRegCode(op1));
+        output.append("0001100")
+                .append(wordValue(op1))
+                .append("11")
+                .append(getRegCode(op2))
+                .append(getRegCode(op1));
         offset += 4;
         return output;
     }
 
     private StringBuilder generateJL(String label) {
         var output = new StringBuilder();
-        output.append("000011111000");
-        output.append("1100");
+        output.append("000011111000")
+                .append("1100");
         jumps.add(new JumpMetadata(output, label));
         offset += 6;
         return output;
@@ -375,8 +341,8 @@ public class ObjectCodeGenerator {
 
     private StringBuilder generateJNE(String label) {
         var output = new StringBuilder();
-        output.append("000011111000");
-        output.append("0101");
+        output.append("000011111000")
+                .append("0101");
         jumps.add(new JumpMetadata(output, label));
         offset += 6;
         return output;
@@ -384,8 +350,8 @@ public class ObjectCodeGenerator {
 
     private StringBuilder generateJE(String label) {
         var output = new StringBuilder();
-        output.append("000011111000");
-        output.append("0100");
+        output.append("000011111000")
+                .append("0100");
         jumps.add(new JumpMetadata(output, label));
         offset += 6;
         return output;
@@ -409,20 +375,20 @@ public class ObjectCodeGenerator {
 
     private StringBuilder generateDIV(String reg) {
         var output = new StringBuilder();
-        output.append("1111011");
-        output.append(wordValue(reg));
-        output.append("11110");
-        output.append(getRegCode(reg));
+        output.append("1111011")
+                .append(wordValue(reg))
+                .append("11110")
+                .append(getRegCode(reg));
         offset += 4;
         return output;
     }
 
     private StringBuilder generateINC(String reg) {
         var output = new StringBuilder();
-        output.append("1111111");
-        output.append(wordValue(reg));
-        output.append("11110");
-        output.append(getRegCode(reg));
+        output.append("1111111")
+                .append(wordValue(reg))
+                .append("11110")
+                .append(getRegCode(reg));
         offset += 4;
         return output;
     }
@@ -439,10 +405,10 @@ public class ObjectCodeGenerator {
         } catch (IllegalArgumentException e) {
             isReg = false;
         }
-        output.append(isReg ? "0" : "1");
-        output.append("000000");
-        output.append(wordValue(op1));
-        output.append("11");
+        output.append(isReg ? "0" : "1")
+                .append("000000")
+                .append(wordValue(op1))
+                .append("11");
 
         if (isReg) {
             output.append(reg2);
@@ -461,16 +427,16 @@ public class ObjectCodeGenerator {
 
     private StringBuilder generatePUSH(String reg) {
         var output = new StringBuilder();
-        output.append("01010");
-        output.append(getRegCode(reg));
+        output.append("01010")
+                .append(getRegCode(reg));
         offset += 2;
         return output;
     }
 
     private StringBuilder generatePOP(String reg) {
         var output = new StringBuilder();
-        output.append("01011");
-        output.append(getRegCode(reg));
+        output.append("01011")
+                .append(getRegCode(reg));
         offset += 2;
         return output;
     }
@@ -478,9 +444,9 @@ public class ObjectCodeGenerator {
     private StringBuilder generateINT(String type) {
         var output = new StringBuilder();
         var typeI = parseNumToBin(type, 8);
-        output.append("11001101");
-        output.append(typeI);
-        offset += 4;
+        output.append("11001101")
+                .append(typeI);
+        offset += 2;
         return output;
     }
 }

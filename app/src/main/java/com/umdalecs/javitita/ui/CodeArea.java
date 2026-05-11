@@ -128,7 +128,7 @@ public class CodeArea extends JPanel {
         StyledDocument doc = codeField.getStyledDocument();
 
         Style style = codeField.addStyle("KeywordStyle", null);
-        StyleConstants.setForeground(style, Color.BLUE);
+        StyleConstants.setForeground(style, new Color(215, 58, 73));
 
         doc.setCharacterAttributes(token.absolutePos(), token.literal().length(), style, false);
     }
@@ -137,7 +137,7 @@ public class CodeArea extends JPanel {
         StyledDocument doc = codeField.getStyledDocument();
 
         Style style = codeField.addStyle("IntegerStyle", null);
-        StyleConstants.setForeground(style, Color.ORANGE);
+        StyleConstants.setForeground(style, new Color(0, 92, 197));
 
         doc.setCharacterAttributes(token.absolutePos(), token.literal().length(), style, false);
     }
@@ -146,7 +146,7 @@ public class CodeArea extends JPanel {
         StyledDocument doc = codeField.getStyledDocument();
 
         Style style = codeField.addStyle("IdentStyle", null);
-        StyleConstants.setForeground(style, Color.MAGENTA);
+        StyleConstants.setForeground(style, new Color(111, 66, 193));
 
         doc.setCharacterAttributes(token.absolutePos(), token.literal().length(), style, false);
     }
