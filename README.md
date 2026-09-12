@@ -29,9 +29,9 @@ T={class, {, }, ;, boolean, int, void, while, (, ), println, =, <, +, -, _, true
 
 ## Instrucciones intel utilizadas
 
+```
 ### MOV
 
-```
 1000 10dw oorrmmm
 - mov reg reg ->
 - mov mem reg ->
